@@ -94,7 +94,10 @@ export default function WorkOrderDetailPage({
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-semibold text-gray-800">{inv.brand} {inv.model}</p>
-                          <p className="text-sm text-gray-600">{inv.location}</p>
+                          <p className="text-sm text-gray-600">{inv.locations[0]?.address}</p>
+                          {inv.locations.length > 1 && (
+                            <p className="text-xs text-gray-500 mt-1">+{inv.locations.length - 1} more location{inv.locations.length - 1 !== 1 ? 's' : ''}</p>
+                          )}
                         </div>
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
                           {inv.type.toUpperCase()}

@@ -41,15 +41,17 @@ export default function ReportsPage() {
   // Inventory Report
   const expiredWarranty = mockInventory.filter((inv) => {
     const today = new Date();
-    return new Date(inv.warrantyEnd) < today;
+    return inv.locations.some((loc) => new Date(loc.warrantyEnd) < today);
   }).length;
 
   const expiringWarranty = mockInventory.filter((inv) => {
     const today = new Date();
-    const warranty = new Date(inv.warrantyEnd);
-    const diffTime = warranty.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays >= 0 && diffDays <= 90;
+    return inv.locations.some((loc) => {
+      const warranty = new Date(loc.warrantyEnd);
+      const diffTime = warranty.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays >= 0 && diffDays <= 90;
+    });
   }).length;
 
   // Export functions
@@ -94,11 +96,28 @@ export default function ReportsPage() {
       { key: 'model', label: 'Model' },
       { key: 'type', label: 'Type' },
       { key: 'location', label: 'Location' },
+      { key: 'quantity', label: 'Quantity' },
+      { key: 'propertyId', label: 'Property' },
+      { key: 'installDate', label: 'Install Date' },
       { key: 'warrantyEnd', label: 'Warranty End' },
       { key: 'status', label: 'Status' },
     ];
 
-    await exportToExcel(mockInventory, columns, `inventory_report_${new Date().toISOString().split('T')[0]}`);
+    const exportData = mockInventory.flatMap((item) =>
+      item.locations.map((loc) => ({
+        brand: item.brand,
+        model: item.model,
+        type: item.type,
+        location: loc.address,
+        quantity: loc.quantity,
+        propertyId: mockProperties.find((p) => p.id === loc.propertyId)?.address || loc.propertyId,
+        installDate: loc.installDate,
+        warrantyEnd: loc.warrantyEnd,
+        status: loc.status,
+      }))
+    );
+
+    await exportToExcel(exportData, columns, `inventory_report_${new Date().toISOString().split('T')[0]}`);
   };
 
   return (

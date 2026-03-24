@@ -112,22 +112,6 @@ export default function Navbar() {
                   {t('admin')}
                 </Link>
               )}
-              <Link
-                href="/tenants"
-                className={`hover:text-blue-200 transition ${
-                  isActive('/tenants') ? 'text-blue-300 border-b-2 border-blue-300' : ''
-                }`}
-              >
-                {t('tenants')}
-              </Link>
-              <Link
-                href="/payments"
-                className={`hover:text-blue-200 transition ${
-                  isActive('/payments') ? 'text-blue-300 border-b-2 border-blue-300' : ''
-                }`}
-              >
-                {t('payments')}
-              </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">

@@ -16,7 +16,7 @@ export default function PropertyDetailPage() {
     (r) => r.propertyId === id
   );
   const propertyInventory = mockInventory.filter(
-    (inv) => inv.propertyId === id
+    (inv) => inv.locations.some((loc) => loc.propertyId === id)
   );
 
   if (!property) {
@@ -209,70 +209,85 @@ export default function PropertyDetailPage() {
                   </Link>
                 </div>
                 <div className="space-y-4">
-                  {propertyInventory.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => router.push(`/inventory/${item.id}`)}
-                      className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md hover:bg-blue-50 transition cursor-pointer"
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-gray-600 text-sm font-semibold">Type</p>
-                          <p className="font-semibold text-gray-800 capitalize">{item.type}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 text-sm font-semibold">Brand / Model</p>
-                          <p className="font-semibold text-blue-600 hover:text-blue-800">
-                            {item.brand} {item.model}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 text-sm font-semibold">Location</p>
-                          <p className="font-semibold text-gray-800">{item.location}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 text-sm font-semibold">Status</p>
-                          <span
-                            className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
-                              item.status === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : item.status === 'inactive'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}
-                          >
-                            {item.status}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 text-sm font-semibold">Install Date</p>
-                          <p className="font-semibold text-gray-800">{item.installDate}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 text-sm font-semibold">Warranty End</p>
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold text-gray-800">{item.warrantyEnd}</p>
-                            {isWarrantyExpired(item.warrantyEnd) ? (
-                              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">
-                                EXPIRED
-                              </span>
-                            ) : isWarrantyExpiring(item.warrantyEnd) ? (
-                              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                {getWarrantyDaysRemaining(item.warrantyEnd)}d
-                              </span>
-                            ) : (
-                              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">
-                                Active
-                              </span>
-                            )}
+                  {propertyInventory.map((item) => {
+                    // Get locations for this property
+                    const locationForThisProperty = item.locations.filter((loc) => loc.propertyId === id);
+                    const firstLocation = locationForThisProperty[0];
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => router.push(`/inventory/${item.id}`)}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md hover:bg-blue-50 transition cursor-pointer"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">Type</p>
+                            <p className="font-semibold text-gray-800 capitalize">{item.type}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">Brand / Model</p>
+                            <p className="font-semibold text-blue-600 hover:text-blue-800">
+                              {item.brand} {item.model}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">Location</p>
+                            <div>
+                              <p className="font-semibold text-gray-800">{firstLocation?.address}</p>
+                              {locationForThisProperty.length > 1 && (
+                                <p className="text-xs text-gray-500 mt-1">+{locationForThisProperty.length - 1} more location{locationForThisProperty.length - 1 !== 1 ? 's' : ''}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">Status</p>
+                            <span
+                              className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
+                                firstLocation?.status === 'active'
+                                  ? 'bg-green-100 text-green-800'
+                                  : firstLocation?.status === 'inactive'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {firstLocation?.status}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">Install Date</p>
+                            <p className="font-semibold text-gray-800">{firstLocation?.installDate}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">Warranty End</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-gray-800">{firstLocation?.warrantyEnd}</p>
+                              {firstLocation && (
+                                <>
+                                  {isWarrantyExpired(firstLocation.warrantyEnd) ? (
+                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">
+                                      EXPIRED
+                                    </span>
+                                  ) : isWarrantyExpiring(firstLocation.warrantyEnd) ? (
+                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                      {getWarrantyDaysRemaining(firstLocation.warrantyEnd)}d
+                                    </span>
+                                  ) : (
+                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">
+                                      Active
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
+                        <p className="text-blue-600 text-xs mt-3 font-semibold">
+                          View Details →
+                        </p>
                       </div>
-                      <p className="text-blue-600 text-xs mt-3 font-semibold">
-                        View Details →
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="mt-6 pt-4 border-t">
                   <Link

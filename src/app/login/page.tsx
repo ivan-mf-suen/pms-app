@@ -108,7 +108,7 @@ export default function LoginPage() {
               }`}
               required
               aria-required="true"
-              aria-invalid={emailTouched && email && !isValidEmail}
+              aria-invalid={emailTouched && email && !isValidEmail ? true : false}
               aria-describedby={
                 emailTouched && email && !isValidEmail ? 'email-error' : undefined
               }

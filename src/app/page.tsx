@@ -48,33 +48,11 @@ export default function Home() {
             subtext={t('totalAssetValue')}
             icon="💰"
           />
-          <StatCard
-            label={t('monthlyRent')}
-            value={`$${totalMonthlyRent.toLocaleString()}`}
-            subtext={t('estimatedRecurringRevenue')}
-            icon="💵"
-          />
-        </div>
-
-        {/* Statistics Row 2 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <StatCard
-            label={t('activeTenants')}
-            value={mockTenants.length}
-            subtext={t('currentlyLeasing')}
-            icon="👥"
-          />
-          <StatCard
+           <StatCard
             label={t('maintenanceIssues')}
             value={maintenanceIssues}
             subtext={`${mockMaintenanceRequests.filter((r) => (r.priority === 'urgent' || r.priority === 'high') && r.status !== 'completed').length} ${t('urgent')}`}
             icon="🔧"
-          />
-          <StatCard
-            label={t('pendingPayments')}
-            value={pendingPayments}
-            subtext={t('actionRequired')}
-            icon="📋"
           />
         </div>
 
@@ -99,28 +77,17 @@ export default function Home() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Recent Payments */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-gray-800">Recent Payments</h3>
-                <a href="/payments" className="text-blue-600 hover:underline text-xs">
-                  View All →
-                </a>
+            {/* Maintenance Requests Row */}
+              <div className="bg-white rounded-lg shadow p-6 mb-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold text-gray-800">Recent Maintenance Requests</h2>
+                  <a href="/maintenance" className="text-blue-600 hover:underline text-sm">
+                    View All →
+                  </a>
+                </div>
+                <MaintenanceList requests={mockMaintenanceRequests} />
               </div>
-              <RecentPayments payments={mockPayments} />
-            </div>
           </div>
-        </div>
-
-        {/* Maintenance Requests Row */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-800">Recent Maintenance Requests</h2>
-            <a href="/maintenance" className="text-blue-600 hover:underline text-sm">
-              View All →
-            </a>
-          </div>
-          <MaintenanceList requests={mockMaintenanceRequests} />
         </div>
       </div>
     </div>

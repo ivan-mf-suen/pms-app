@@ -36,7 +36,9 @@ export default function InventoryPage() {
   let filtered = mockInventory;
 
   if (filterProperty !== 'all') {
-    filtered = filtered.filter((item) => item.propertyId === filterProperty);
+    filtered = filtered.filter((item) =>
+      item.locations.some((loc) => loc.propertyId === filterProperty)
+    );
   }
 
   if (filterType !== 'all') {
@@ -44,11 +46,19 @@ export default function InventoryPage() {
   }
 
   if (filterWarranty === 'expiring') {
-    filtered = filtered.filter((item) => isWarrantyExpiring(item.warrantyEnd));
+    filtered = filtered.filter((item) =>
+      item.locations.some((loc) => isWarrantyExpiring(loc.warrantyEnd))
+    );
   } else if (filterWarranty === 'expired') {
-    filtered = filtered.filter((item) => isWarrantyExpired(item.warrantyEnd));
+    filtered = filtered.filter((item) =>
+      item.locations.some((loc) => isWarrantyExpired(loc.warrantyEnd))
+    );
   } else if (filterWarranty === 'active') {
-    filtered = filtered.filter((item) => !isWarrantyExpired(item.warrantyEnd) && !isWarrantyExpiring(item.warrantyEnd));
+    filtered = filtered.filter((item) =>
+      item.locations.some(
+        (loc) => !isWarrantyExpired(loc.warrantyEnd) && !isWarrantyExpiring(loc.warrantyEnd)
+      )
+    );
   }
 
   // Export functions
@@ -60,16 +70,30 @@ export default function InventoryPage() {
       { key: 'hp', label: t('hp') },
       { key: 'type', label: t('inventoryType') },
       { key: 'location', label: t('location') },
+      { key: 'quantity', label: 'Quantity' },
+      { key: 'totalQuantity', label: 'Total Quantity' },
       { key: 'propertyId', label: t('properties') },
       { key: 'installDate', label: t('installDate') },
       { key: 'warrantyEnd', label: t('warrantyEnd') },
       { key: 'status', label: t('status') },
     ];
 
-    const exportData = filtered.map((item) => ({
-      ...item,
-      propertyId: mockProperties.find((p) => p.id === item.propertyId)?.address || item.propertyId,
-    }));
+    const exportData = filtered.flatMap((item) =>
+      item.locations.map((loc) => ({
+        id: item.id,
+        brand: item.brand,
+        model: item.model,
+        hp: item.hp || '',
+        type: item.type,
+        location: loc.address,
+        quantity: loc.quantity,
+        totalQuantity: item.locations.reduce((sum, l) => sum + l.quantity, 0),
+        propertyId: mockProperties.find((p) => p.id === loc.propertyId)?.address || loc.propertyId,
+        installDate: loc.installDate,
+        warrantyEnd: loc.warrantyEnd,
+        status: loc.status,
+      }))
+    );
 
     await exportToExcel(exportData, columns, `inventory_${new Date().toISOString().split('T')[0]}`);
   };
@@ -82,16 +106,30 @@ export default function InventoryPage() {
       { key: 'hp', label: t('hp') },
       { key: 'type', label: t('inventoryType') },
       { key: 'location', label: t('location') },
+      { key: 'quantity', label: 'Quantity' },
+      { key: 'totalQuantity', label: 'Total Quantity' },
       { key: 'propertyId', label: t('properties') },
       { key: 'installDate', label: t('installDate') },
       { key: 'warrantyEnd', label: t('warrantyEnd') },
       { key: 'status', label: t('status') },
     ];
 
-    const exportData = filtered.map((item) => ({
-      ...item,
-      propertyId: mockProperties.find((p) => p.id === item.propertyId)?.address || item.propertyId,
-    }));
+    const exportData = filtered.flatMap((item) =>
+      item.locations.map((loc) => ({
+        id: item.id,
+        brand: item.brand,
+        model: item.model,
+        hp: item.hp || '',
+        type: item.type,
+        location: loc.address,
+        quantity: loc.quantity,
+        totalQuantity: item.locations.reduce((sum, l) => sum + l.quantity, 0),
+        propertyId: mockProperties.find((p) => p.id === loc.propertyId)?.address || loc.propertyId,
+        installDate: loc.installDate,
+        warrantyEnd: loc.warrantyEnd,
+        status: loc.status,
+      }))
+    );
 
     const csv = generateCSV(exportData, columns);
     downloadCSV(csv, `inventory_${new Date().toISOString().split('T')[0]}`);
@@ -196,6 +234,7 @@ export default function InventoryPage() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('model')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('inventoryType')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('location')}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Total Qty</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Property</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('installDate')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('warrantyEnd')}</th>
@@ -205,16 +244,23 @@ export default function InventoryPage() {
               <tbody className="divide-y">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                       No inventory items found matching the selected filters.
                     </td>
                   </tr>
                 ) : (
                   filtered.map((item) => {
-                    const property = mockProperties.find((p) => p.id === item.propertyId);
-                    const daysRemaining = getWarrantyDaysRemaining(item.warrantyEnd);
-                    const isExpired = isWarrantyExpired(item.warrantyEnd);
-                    const isExpiring = isWarrantyExpiring(item.warrantyEnd);
+                    // Use first location for display
+                    const firstLocation = item.locations[0];
+                    const property = mockProperties.find((p) => p.id === firstLocation.propertyId);
+                    
+                    // Get most critical warranty status across all locations
+                    const anyExpired = item.locations.some((loc) => isWarrantyExpired(loc.warrantyEnd));
+                    const anyExpiring = item.locations.some((loc) => isWarrantyExpiring(loc.warrantyEnd));
+                    
+                    const daysRemaining = getWarrantyDaysRemaining(firstLocation.warrantyEnd);
+                    const isExpired = anyExpired;
+                    const isExpiring = anyExpiring && !anyExpired;
 
                     return (
                       <tr
@@ -229,12 +275,24 @@ export default function InventoryPage() {
                             {item.type.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-800">{item.location}</td>
+                        <td className="px-6 py-4 text-sm text-gray-800">
+                          <div>
+                            <p className="font-semibold">{firstLocation.address}</p>
+                            {item.locations.length > 1 && (
+                              <p className="text-xs text-gray-500 mt-1">+{item.locations.length - 1} more location{item.locations.length - 1 !== 1 ? 's' : ''}</p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center">
+                          <span className="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded text-sm font-semibold">
+                            {item.locations.reduce((sum, loc) => sum + loc.quantity, 0)}
+                          </span>
+                        </td>
                         <td className="px-6 py-4 text-sm text-gray-800">{property?.address || 'N/A'}</td>
-                        <td className="px-6 py-4 text-sm text-gray-800">{item.installDate}</td>
+                        <td className="px-6 py-4 text-sm text-gray-800">{firstLocation.installDate}</td>
                         <td className="px-6 py-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <span>{item.warrantyEnd}</span>
+                            <span>{firstLocation.warrantyEnd}</span>
                             {isExpired && (
                               <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold">
                                 EXPIRED
@@ -252,14 +310,14 @@ export default function InventoryPage() {
                         <td className="px-6 py-4 text-sm">
                           <span
                             className={`px-2 py-1 rounded text-xs font-semibold ${
-                              item.status === 'active'
+                              firstLocation.status === 'active'
                                 ? 'bg-green-100 text-green-800'
-                                : item.status === 'inactive'
+                                : firstLocation.status === 'inactive'
                                 ? 'bg-gray-100 text-gray-800'
                                 : 'bg-red-100 text-red-800'
                             }`}
                           >
-                            {item.status}
+                            {firstLocation.status}
                           </span>
                         </td>
                       </tr>
