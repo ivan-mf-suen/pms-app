@@ -9,6 +9,9 @@ interface AuthContextType {
   isHydrated: boolean;
   login: (email: string, password: string) => boolean;
   logout: () => void;
+  rememberEmail: (email: string) => void;
+  getRememberedEmail: () => string | null;
+  clearRememberedEmail: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,6 +54,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('pms_user');
   };
 
+  const rememberEmail = (email: string) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('pms_remembered_email', email);
+    }
+  };
+
+  const getRememberedEmail = (): string | null => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('pms_remembered_email');
+  };
+
+  const clearRememberedEmail = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('pms_remembered_email');
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -59,6 +79,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isHydrated,
         login,
         logout,
+        rememberEmail,
+        getRememberedEmail,
+        clearRememberedEmail,
       }}
     >
       {children}
