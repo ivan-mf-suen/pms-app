@@ -1,0 +1,336 @@
+'use client';
+
+import { mockProperties, mockTenants, mockMaintenanceRequests, mockInventory } from '@/lib/mockData';
+import Image from 'next/image';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+
+export default function PropertyDetailPage() { 
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  const property = mockProperties.find((p) => p.id === id);
+  const tenant = mockTenants.find((t) => t.propertyId === id);
+  const maintenanceRequests = mockMaintenanceRequests.filter(
+    (r) => r.propertyId === id
+  );
+  const propertyInventory = mockInventory.filter(
+    (inv) => inv.propertyId === id
+  );
+
+  if (!property) {
+    notFound();
+  }
+
+  // Warranty calculation helper
+  const getWarrantyDaysRemaining = (warrantyEnd: string): number => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const warranty = new Date(warrantyEnd);
+    warranty.setHours(0, 0, 0, 0);
+    const diffTime = warranty.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const isWarrantyExpiring = (warrantyEnd: string): boolean => {
+    const daysRemaining = getWarrantyDaysRemaining(warrantyEnd);
+    return daysRemaining >= 0 && daysRemaining <= 90;
+  };
+
+  const isWarrantyExpired = (warrantyEnd: string): boolean => {
+    return getWarrantyDaysRemaining(warrantyEnd) < 0;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <div className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <a href="/properties" className="text-blue-600 hover:underline mb-4 block">
+            ← Back to Properties
+          </a>
+          <h1 className="text-3xl font-bold text-gray-800">{property.address}</h1>
+          <p className="text-gray-600 mt-1">
+            {property.city}, {property.state} {property.zipCode}
+          </p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Images */}
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="relative w-full h-96 bg-gray-200">
+                {property.imageUrl ? (
+                  <Image
+                    src={property.imageUrl}
+                    alt={property.address}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 66vw"
+                    loading="eager"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400">
+                    No image available
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Property Details */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Property Details</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-600 text-sm">Property Type</p>
+                  <p className="font-semibold text-gray-800 capitalize">{property.type}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Status</p>
+                  <p className="font-semibold text-gray-800 capitalize">{property.status}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Bedrooms</p>
+                  <p className="font-semibold text-gray-800">{property.bedrooms}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Bathrooms</p>
+                  <p className="font-semibold text-gray-800">{property.bathrooms}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Square Feet</p>
+                  <p className="font-semibold text-gray-800">{property.squareFeet.toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Current Value</p>
+                  <p className="font-semibold text-gray-800">
+                    ${property.currentValue.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Tenant Information */}
+            {tenant && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Tenant Information</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <p className="text-gray-600 text-sm">Name</p>
+                    <p className="font-semibold text-gray-800">{tenant.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Email</p>
+                    <p className="font-semibold text-gray-800">{tenant.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Phone</p>
+                    <p className="font-semibold text-gray-800">{tenant.phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Monthly Rent</p>
+                    <p className="font-semibold text-gray-800">${tenant.monthlyRent.toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm">Status</p>
+                    <p className="font-semibold text-gray-800 capitalize">{tenant.status}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Maintenance History */}
+            {maintenanceRequests.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">Maintenance Requests</h2>
+                <div className="space-y-4">
+                  {maintenanceRequests.map((request) => (
+                    <div
+                      key={request.id}
+                      onClick={() => router.push(`/maintenance/${request.id}`)}
+                      className="border border-gray-200 rounded p-4 mb-4 hover:border-blue-400 hover:shadow-md hover:bg-blue-50 transition cursor-pointer"
+                    >
+                      <p className="font-semibold text-gray-800 text-blue-600 group-hover:text-blue-700">
+                        {request.title}
+                      </p>
+                      <p className="text-gray-600 text-sm mt-1">{request.description}</p>
+                      <div className="flex gap-2 mt-2">
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${
+                            request.priority === 'urgent'
+                              ? 'bg-red-100 text-red-800'
+                              : request.priority === 'high'
+                              ? 'bg-orange-100 text-orange-800'
+                              : request.priority === 'medium'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {request.priority}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${
+                            request.status === 'completed'
+                              ? 'bg-green-100 text-green-800'
+                              : request.status === 'in_progress'
+                              ? 'bg-blue-100 text-blue-800'
+                              : request.status === 'open'
+                              ? 'bg-gray-100 text-gray-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {request.status}
+                        </span>
+                      </div>
+                      <p className="text-blue-600 text-xs mt-3 font-semibold">
+                        View Details →
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Product Inventory Details */}
+            {propertyInventory.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-800">Product Inventory</h2>
+                  <Link
+                    href="/inventory"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
+                  >
+                    View All Inventory →
+                  </Link>
+                </div>
+                <div className="space-y-4">
+                  {propertyInventory.map((item) => (
+                    <div
+                      key={item.id}
+                      onClick={() => router.push(`/inventory/${item.id}`)}
+                      className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md hover:bg-blue-50 transition cursor-pointer"
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-gray-600 text-sm font-semibold">Type</p>
+                          <p className="font-semibold text-gray-800 capitalize">{item.type}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600 text-sm font-semibold">Brand / Model</p>
+                          <p className="font-semibold text-blue-600 hover:text-blue-800">
+                            {item.brand} {item.model}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600 text-sm font-semibold">Location</p>
+                          <p className="font-semibold text-gray-800">{item.location}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600 text-sm font-semibold">Status</p>
+                          <span
+                            className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
+                              item.status === 'active'
+                                ? 'bg-green-100 text-green-800'
+                                : item.status === 'inactive'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-gray-600 text-sm font-semibold">Install Date</p>
+                          <p className="font-semibold text-gray-800">{item.installDate}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600 text-sm font-semibold">Warranty End</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-gray-800">{item.warrantyEnd}</p>
+                            {isWarrantyExpired(item.warrantyEnd) ? (
+                              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">
+                                EXPIRED
+                              </span>
+                            ) : isWarrantyExpiring(item.warrantyEnd) ? (
+                              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                {getWarrantyDaysRemaining(item.warrantyEnd)}d
+                              </span>
+                            ) : (
+                              <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">
+                                Active
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-blue-600 text-xs mt-3 font-semibold">
+                        View Details →
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 pt-4 border-t">
+                  <Link
+                    href="/inventory"
+                    className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                  >
+                    View All Property Inventory →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            {/* Financial Summary */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Financial Summary</h2>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-gray-600 text-sm">Purchase Price</p>
+                  <p className="font-bold text-lg text-gray-800">
+                    ${property.purchasePrice.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">Current Value</p>
+                  <p className="font-bold text-lg text-green-600">
+                    ${property.currentValue.toLocaleString()}
+                  </p>
+                </div>
+                <div className="pt-4 border-t">
+                  <p className="text-gray-600 text-sm">Equity Gain</p>
+                  <p className="font-bold text-lg text-green-600">
+                    ${(property.currentValue - property.purchasePrice).toLocaleString()}
+                  </p>
+                </div>
+                {tenant && (
+                  <>
+                    <div className="pt-4 border-t">
+                      <p className="text-gray-600 text-sm">Monthly Rent</p>
+                      <p className="font-bold text-lg text-gray-800">
+                        ${tenant.monthlyRent.toLocaleString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600 text-sm">Annual Rent</p>
+                      <p className="font-bold text-lg text-blue-600">
+                        ${(tenant.monthlyRent * 12).toLocaleString()}
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
