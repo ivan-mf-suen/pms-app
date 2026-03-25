@@ -15,10 +15,11 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
     if (!isHydrated) return;
 
     const isLoginPage = pathname === "/login";
+    const isForgotPasswordPage = pathname === "/forgot-password";
     const isAuthenticated = !!user;
-
-    // Redirect to login if not authenticated and not on login page
-    if (!isAuthenticated && !isLoginPage) {
+    
+    // Redirect to login if not authenticated and not on public pages
+    if (!isAuthenticated && !isLoginPage && !isForgotPasswordPage) {
       router.push("/login");
     }
 
