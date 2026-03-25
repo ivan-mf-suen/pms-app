@@ -80,9 +80,9 @@ export default function Home() {
             {/* Maintenance Requests Row */}
               <div className="bg-white rounded-lg shadow p-6 mb-8">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold text-gray-800">Recent Maintenance Requests</h2>
+                  <h2 className="text-xl font-bold text-gray-800">{t('recentMaintenanceRequests')}</h2>
                   <a href="/maintenance" className="text-blue-600 hover:underline text-sm">
-                    View All →
+                    {t('viewAll')} →
                   </a>
                 </div>
                 <MaintenanceList requests={mockMaintenanceRequests} />
