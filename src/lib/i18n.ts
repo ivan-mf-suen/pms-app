@@ -487,3 +487,22 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     operationFailed: '操作失敗。請再試一次。',
   },
 };
+
+/**
+ * Get translation for a key, supporting nested keys with dot notation
+ * Example: t('admin.permissions') or t('dashboard')
+ */
+export function getTranslation(
+  language: Language,
+  key: string,
+  defaultValue?: string
+): string {
+  const keys = key.split('.');
+  let value: any = i18nDict[language];
+
+  for (const k of keys) {
+    value = value?.[k];
+  }
+
+  return typeof value === 'string' ? value : defaultValue || key;
+}
