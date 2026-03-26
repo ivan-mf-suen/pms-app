@@ -281,6 +281,25 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Actions - Admin/Manager Only */}
+            <div className="bg-white rounded-lg shadow p-6 mt-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{t('actions')}</h2>
+              <div className="flex gap-3 flex-wrap">
+                <Link
+                  href={`/properties/${property.id}/edit`}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm"
+                >
+                  {t('edit')}
+                </Link>
+                <Link
+                  href="/properties"
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition text-sm"
+                >
+                  {t('back')}
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

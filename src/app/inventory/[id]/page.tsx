@@ -234,6 +234,23 @@ export default function InventoryDetailPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">Actions</h2>
             <div className="flex gap-4 flex-wrap">
+              {item.locations.some((loc) => isWarrantyExpired(loc.warrantyEnd)) && (
+                <button
+                  onClick={() => {
+                    const expiredLocations = item.locations.filter((loc) => isWarrantyExpired(loc.warrantyEnd));
+                    if (expiredLocations.length === 1) {
+                      router.push(`/maintenance/create?inventoryId=${item.id}&locationId=${expiredLocations[0].id}`);
+                    } else {
+                      // Multiple expired locations - let the user choose
+                      const locationId = expiredLocations[0].id; // Default to first for now
+                      router.push(`/maintenance/create?inventoryId=${item.id}&locationId=${locationId}`);
+                    }
+                  }}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold"
+                >
+                  Create Maintenance Request
+                </button>
+              )}
               <Link
                 href="/inventory"
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"

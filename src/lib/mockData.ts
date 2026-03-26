@@ -43,11 +43,17 @@ export interface MaintenanceRequest {
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'open' | 'in_progress' | 'completed' | 'canceled';
+  status: 'pending_approval' | 'open' | 'in_progress' | 'completed' | 'canceled';
   createdDate: string;
   completedDate?: string;
   estimatedCost: number;
   actualCost?: number;
+  inventoryId?: string;
+  createdBy?: string;
+  workOrderId?: string; // Link to created work order
+  approvedBy?: string; // Who approved
+  approvedDate?: string; // When approved
+  rejectionReason?: string; // Why rejected (if canceled)
 }
 
 export interface Payment {
@@ -106,6 +112,7 @@ export interface WorkOrder {
   controlNumber: string;
   propertyId: string;
   inventoryIds: string[];
+  maintenanceRequestId?: string; // Link back to the maintenance request that created this work order
   status: 'open' | 'in_progress' | 'completed' | 'on_hold';
   createdDate: string;
   completedDate?: string;
@@ -295,30 +302,33 @@ export const mockMaintenanceRequests: MaintenanceRequest[] = [
     completedDate: '2024-03-05',
     estimatedCost: 50,
     actualCost: 45,
+    inventoryId: 'inv-002',
   },
   {
     id: 'maint-003',
-    propertyId: 'prop-001',
-    title: 'Roof inspection',
-    description: 'Tenant reported water leak during last rain',
+    propertyId: 'prop-002',
+    title: 'Replace Trane HVAC unit - Warranty expired',
+    description: 'HVAC unit warranty expired on 2025-03-10. Roof inspection and unit replacement needed to prevent water damage.',
     priority: 'urgent',
     status: 'in_progress',
     createdDate: '2024-03-10',
     estimatedCost: 1200,
+    inventoryId: 'inv-003',
   },
   {
     id: 'maint-004',
-    propertyId: 'prop-004',
-    title: 'Paint exterior walls',
-    description: 'Exterior paint is peeling and needs refresh',
-    priority: 'low',
+    propertyId: 'prop-002',
+    title: 'Replace Lennox HVAC unit - Warranty expired',
+    description: 'HVAC unit warranty expired on 2024-11-22. Unit condition is fair and needs preventive replacement.',
+    priority: 'high',
     status: 'open',
     createdDate: '2024-03-12',
     estimatedCost: 3500,
+    inventoryId: 'inv-004',
   },
   {
     id: 'maint-005',
-    propertyId: 'prop-005',
+    propertyId: 'prop-002',
     title: 'Fix parking lot pothole',
     description: 'Large pothole in parking lot creating safety hazard',
     priority: 'high',

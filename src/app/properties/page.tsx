@@ -2,16 +2,36 @@
 
 import PropertyCard from '@/components/PropertyCard';
 import { mockProperties } from '@/lib/mockData';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
+import Link from 'next/link';
 
 export default function PropertiesPage() {
   const { t } = useI18n();
   const [filter, setFilter] = useState<string>('all');
+  const [allProperties, setAllProperties] = useState(mockProperties);
+
+  // Load properties from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('properties');
+      const savedProperties = saved ? JSON.parse(saved) : [];
+      
+      // Combine: mock data + saved properties (avoid duplicates by ID)
+      const combinedProperties = [...mockProperties];
+      savedProperties.forEach((saved: any) => {
+        if (!combinedProperties.find(p => p.id === saved.id)) {
+          combinedProperties.push(saved);
+        }
+      });
+      
+      setAllProperties(combinedProperties);
+    }
+  }, []);
 
   const filtered = filter === 'all' 
-    ? mockProperties 
-    : mockProperties.filter((p) => p.status === filter);
+    ? allProperties 
+    : allProperties.filter((p) => p.status === filter);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -25,6 +45,17 @@ export default function PropertiesPage() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Actions */}
+        <div className="bg-white rounded-lg shadow p-4 mb-6 flex justify-between items-center">
+          <h2 className="text-lg font-bold text-gray-800">{t('manageAllProperties')}</h2>
+          <Link
+            href="/properties/create"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+          >
+            + {t('create')} {t('properties')}
+          </Link>
+        </div>
+
         {/* Filter */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <div className="flex gap-2 flex-wrap">
@@ -36,7 +67,7 @@ export default function PropertiesPage() {
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              {t('allProperties')} ({mockProperties.length})
+              {t('allProperties')} ({allProperties.length})
             </button>
             <button
               onClick={() => setFilter('occupied')}
@@ -46,7 +77,7 @@ export default function PropertiesPage() {
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              {t('propertyStatus_occupied')} ({mockProperties.filter((p) => p.status === 'occupied').length})
+              {t('propertyStatus_occupied')} ({allProperties.filter((p) => p.status === 'occupied').length})
             </button>
             <button
               onClick={() => setFilter('available')}

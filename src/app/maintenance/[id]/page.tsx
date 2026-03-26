@@ -1,6 +1,6 @@
 'use client';
 
-import { mockMaintenanceRequests, mockProperties } from '@/lib/mockData';
+import { mockMaintenanceRequests, mockProperties, mockInventory } from '@/lib/mockData';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useParams } from 'next/navigation';
@@ -16,9 +16,41 @@ export default function MaintenanceDetailPage() {
   const params = useParams();
   const { id } = params as { id: string };
   
+  // Helper to get maintenance request from localStorage or mock data
+  const getMaintenanceRequest = () => {
+    if (typeof window === 'undefined') {
+      return mockMaintenanceRequests.find((r) => r.id === id);
+    }
+    
+    // Check localStorage first
+    const saved = localStorage.getItem('maintenanceRequests');
+    const savedRequests = saved ? JSON.parse(saved) : [];
+    const foundSaved = savedRequests.find((r: any) => r.id === id);
+    
+    if (foundSaved) return foundSaved;
+    
+    // Fallback to mock data
+    return mockMaintenanceRequests.find(r => r.id === id);
+  };
+
   // Resolve params synchronously by finding the maintenance request
-  const request = mockMaintenanceRequests.find((r) => r.id === id);
+  const request = getMaintenanceRequest();
   const property = request ? mockProperties.find((p) => p.id === request.propertyId) : null;
+  const linkedInventory = request && request.inventoryId ? mockInventory.find((inv) => inv.id === request.inventoryId) : null;
+
+  // Calculate warranty days remaining for linked inventory
+  const getWarrantyDaysRemaining = (warrantyEnd: string): number => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const warranty = new Date(warrantyEnd);
+    warranty.setHours(0, 0, 0, 0);
+    const diffTime = warranty.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
+  const isWarrantyExpired = (warrantyEnd: string): boolean => {
+    return getWarrantyDaysRemaining(warrantyEnd) < 0;
+  };
 
   if (!request) {
     notFound();
@@ -128,6 +160,42 @@ export default function MaintenanceDetailPage() {
             </div>
           </div>
 
+          {/* Linked Inventory */}
+          {linkedInventory && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{t('linkedInventory')}</h2>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-gray-600 text-sm font-semibold mb-2">{t('brandModel')}</p>
+                    <Link
+                      href={`/inventory/${linkedInventory.id}`}
+                      className="text-blue-600 hover:underline font-semibold"
+                    >
+                      {linkedInventory.brand} {linkedInventory.model}
+                    </Link>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm font-semibold mb-2">{t('inventoryType')}</p>
+                    <p className="font-semibold text-gray-800 capitalize">{t(`type_${linkedInventory.type}`)}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 text-sm font-semibold mb-2">{t('warrantyStatus')}</p>
+                    {linkedInventory.locations.some((loc) => isWarrantyExpired(loc.warrantyEnd)) ? (
+                      <span className="inline-block px-3 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold">
+                        {t('expiredWarranty')}
+                      </span>
+                    ) : (
+                      <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">
+                        {t('active')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Financial Summary */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">{t('financialSummary')}</h2>
@@ -224,13 +292,21 @@ export default function MaintenanceDetailPage() {
           {/* Additional Actions */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">{t('actions')}</h2>
-            <div className="flex gap-4">
+            <div className="flex gap-4 flex-wrap">
               {property && (
                 <Link
                   href={`/properties/${property.id}`}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
                   {t('viewProperty')}
+                </Link>
+              )}
+              {linkedInventory && (
+                <Link
+                  href={`/inventory/${linkedInventory.id}`}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                >
+                  {t('viewInventory')}
                 </Link>
               )}
               <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">

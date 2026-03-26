@@ -1,7 +1,7 @@
 'use client';
 
 import { mockMaintenanceRequests, mockProperties } from '@/lib/mockData';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useI18n } from '@/contexts/I18nContext';
 
@@ -14,6 +14,25 @@ export default function MaintenancePage() {
   const router = useRouter();
   const { t } = useI18n();
   const [filter, setFilter] = useState<string>('all');
+  const [allRequests, setAllRequests] = useState(mockMaintenanceRequests);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('maintenanceRequests');
+      const savedRequests = saved ? JSON.parse(saved) : [];
+      
+      // Combine: mock data + saved data (avoid duplicates by ID)
+      const combinedRequests = [...mockMaintenanceRequests];
+      savedRequests.forEach((saved: any) => {
+        if (!combinedRequests.find(m => m.id === saved.id)) {
+          combinedRequests.push(saved);
+        }
+      });
+      
+      setAllRequests(combinedRequests);
+    }
+  }, []);
 
   const getPropertyAddress = (propertyId: string) => {
     return mockProperties.find((p) => p.id === propertyId)?.address || 'Unknown';
@@ -21,8 +40,8 @@ export default function MaintenancePage() {
 
   const filtered =
     filter === 'all'
-      ? mockMaintenanceRequests
-      : mockMaintenanceRequests.filter((r) => r.status === filter);
+      ? allRequests
+      : allRequests.filter((r) => r.status === filter);
 
   const priorityColors: Record<string, string> = {
     low: 'bg-gray-100 text-gray-800',
@@ -61,7 +80,7 @@ export default function MaintenancePage() {
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              {t('all')} ({mockMaintenanceRequests.length})
+              {t('all')} ({allRequests.length})
             </button>
             <button
               onClick={() => setFilter('open')}
@@ -71,7 +90,7 @@ export default function MaintenancePage() {
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              {t('open')} ({mockMaintenanceRequests.filter((r) => r.status === 'open').length})
+              {t('open')} ({allRequests.filter((r) => r.status === 'open').length})
             </button>
             <button
               onClick={() => setFilter('in_progress')}
@@ -81,7 +100,7 @@ export default function MaintenancePage() {
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              {t('inProgress')} ({mockMaintenanceRequests.filter((r) => r.status === 'in_progress').length})
+              {t('inProgress')} ({allRequests.filter((r) => r.status === 'in_progress').length})
             </button>
             <button
               onClick={() => setFilter('completed')}
@@ -91,7 +110,7 @@ export default function MaintenancePage() {
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              {t('completed')} ({mockMaintenanceRequests.filter((r) => r.status === 'completed').length})
+              {t('completed')} ({allRequests.filter((r) => r.status === 'completed').length})
             </button>
           </div>
         </div>
