@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useParams, useRouter } from 'next/navigation';
+import FloorMap from '@/components/FloorMap';
 
 export default function PropertyDetailPage() { 
   const params = useParams();
@@ -114,6 +115,13 @@ export default function PropertyDetailPage() {
                 </div>
               </div>
             </div>
+
+            {/* Floor Map Section */}
+            <FloorMap
+              propertyId={property.id}
+              floorPlanUrl={property.floorPlanUrl}
+              inventory={mockInventory}
+            />
 
             {/* Tenant Information */}
             {tenant && (
