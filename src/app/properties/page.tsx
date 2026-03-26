@@ -4,10 +4,12 @@ import PropertyCard from '@/components/PropertyCard';
 import { mockProperties } from '@/lib/mockData';
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
 
 export default function PropertiesPage() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const [filter, setFilter] = useState<string>('all');
   const [allProperties, setAllProperties] = useState(mockProperties);
 
@@ -48,12 +50,14 @@ export default function PropertiesPage() {
         {/* Actions */}
         <div className="bg-white rounded-lg shadow p-4 mb-6 flex justify-between items-center">
           <h2 className="text-lg font-bold text-gray-800">{t('manageAllProperties')}</h2>
-          <Link
-            href="/properties/create"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
-          >
-            + {t('create')} {t('properties')}
-          </Link>
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <Link
+              href="/properties/create"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+            >
+              + {t('create')} {t('properties')}
+            </Link>
+          )}
         </div>
 
         {/* Filter */}

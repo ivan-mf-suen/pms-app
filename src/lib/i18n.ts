@@ -177,6 +177,11 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     currentlyBeingWorkedOn: 'Currently being worked on',
     viewProperty: 'View Property',
     printDetails: 'Print Details',
+    approveMaintenance: 'Approve Maintenance',
+    locationsAndWarranty: 'Locations & Warranty',
+    quantity: 'Quantity',
+    condition: 'Condition',
+    lastVerified: 'Last Verified',
 
     // Documents
     document: 'Document',
@@ -443,6 +448,11 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     currentlyBeingWorkedOn: '正在處理中',
     viewProperty: '查看資產',
     printDetails: '打印詳情',
+    approveMaintenance: '批准維護',
+    locationsAndWarranty: '位置與保修',
+    quantity: '數量',
+    condition: '狀況',
+    lastVerified: '最後驗證',
 
     // Documents
     document: '文件',

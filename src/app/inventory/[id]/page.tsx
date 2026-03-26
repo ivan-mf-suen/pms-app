@@ -4,10 +4,12 @@ import { mockInventory, mockProperties } from '@/lib/mockData';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useParams, useRouter } from 'next/navigation';
+import { useI18n } from '@/contexts/I18nContext';
 
 export default function InventoryDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useI18n();
   const { id } = params as { id: string };
 
   const item = mockInventory.find((inv) => inv.id === id);
@@ -86,7 +88,7 @@ export default function InventoryDetailPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6">{t('basicInformation')}
             <h2 className="text-xl font-bold text-gray-800 mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -116,7 +118,7 @@ export default function InventoryDetailPage() {
 
           {/* Detailed Locations */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Locations & Warranty ({item.locations.length})</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">{t('locationsAndWarranty')} ({item.locations.length})</h2>
             <div className="space-y-4">
               {item.locations.map((location, index) => {
                 const locationProperty = mockProperties.find((p) => p.id === location.propertyId);
@@ -147,7 +149,7 @@ export default function InventoryDetailPage() {
                           )}
                         </div>
                         <div>
-                          <p className="text-gray-600 text-sm font-semibold mb-1">Quantity</p>
+                          <p className="text-gray-600 text-sm font-semibold mb-1">{t('quantity')}</p>
                           <p className="font-semibold text-gray-800 text-lg">{location.quantity} unit{location.quantity !== 1 ? 's' : ''}</p>
                         </div>
                       </div>
@@ -202,7 +204,7 @@ export default function InventoryDetailPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t">
                         {location.condition && (
                           <div>
-                            <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">Condition</p>
+                            <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">{t('condition')}</p>
                             <span
                               className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
                                 location.condition === 'excellent'
@@ -219,7 +221,7 @@ export default function InventoryDetailPage() {
                           </div>
                         )}
                         <div>
-                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">Last Verified</p>
+                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">{t('lastVerified')}</p>
                           <p className="font-semibold text-gray-800">{location.lastVerified}</p>
                         </div>
                       </div>

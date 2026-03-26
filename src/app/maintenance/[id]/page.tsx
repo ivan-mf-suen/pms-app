@@ -3,8 +3,10 @@
 import { mockMaintenanceRequests, mockProperties, mockInventory } from '@/lib/mockData';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useI18n } from '@/contexts/I18nContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString + 'T00:00:00');
@@ -13,8 +15,11 @@ const formatDate = (dateString: string) => {
 
 export default function MaintenanceDetailPage() {
   const { t } = useI18n();
+  const { user } = useAuth();
+  const router = useRouter();
   const params = useParams();
   const { id } = params as { id: string };
+  const [isApproving, setIsApproving] = useState(false);
   
   // Helper to get maintenance request from localStorage or mock data
   const getMaintenanceRequest = () => {
@@ -50,6 +55,69 @@ export default function MaintenanceDetailPage() {
 
   const isWarrantyExpired = (warrantyEnd: string): boolean => {
     return getWarrantyDaysRemaining(warrantyEnd) < 0;
+  };
+
+  const handleApproveMaintenance = async () => {
+    if (!user || !(user.role === 'admin' || user.role === 'manager')) return;
+    
+    setIsApproving(true);
+    try {
+      // Generate work order
+      const controlNumber = `WO-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+      const newWorkOrder = {
+        id: `wo-${Date.now()}`,
+        controlNumber,
+        propertyId: request.propertyId,
+        maintenanceRequestId: request.id,
+        inventoryIds: request.inventoryId ? [request.inventoryId] : [],
+        status: 'open' as const,
+        createdDate: new Date().toISOString().split('T')[0],
+        priority: request.priority,
+        description: request.description,
+        financials: {
+          original: request.estimatedCost,
+          voApproved: 0,
+          contingency: 0,
+        },
+        remarks: [],
+        auditLog: [],
+      };
+      
+      // Save work order to localStorage
+      const savedWOs = localStorage.getItem('workOrders');
+      const workOrders = savedWOs ? JSON.parse(savedWOs) : [];
+      workOrders.push(newWorkOrder);
+      localStorage.setItem('workOrders', JSON.stringify(workOrders));
+      
+      // Update maintenance request
+      const approvedRequest = {
+        ...request,
+        status: 'open' as const,
+        approvedBy: user.name,
+        approvedDate: new Date().toISOString().split('T')[0],
+        workOrderId: newWorkOrder.id,
+      };
+      
+      // Save updated maintenance request
+      const savedMRs = localStorage.getItem('maintenanceRequests');
+      const maintenanceRequests = savedMRs ? JSON.parse(savedMRs) : [];
+      const index = maintenanceRequests.findIndex((r: any) => r.id === request.id);
+      if (index >= 0) {
+        maintenanceRequests[index] = approvedRequest;
+      } else {
+        maintenanceRequests.push(approvedRequest);
+      }
+      localStorage.setItem('maintenanceRequests', JSON.stringify(maintenanceRequests));
+      
+      // Show success and redirect
+      alert(t('approveMaintenance') + ' - ' + t('success'));
+      router.push(`/work-orders/${newWorkOrder.id}`);
+    } catch (error) {
+      console.error('Error approving maintenance:', error);
+      alert(t('error'));
+    } finally {
+      setIsApproving(false);
+    }
   };
 
   if (!request) {
@@ -293,6 +361,16 @@ export default function MaintenanceDetailPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">{t('actions')}</h2>
             <div className="flex gap-4 flex-wrap">
+              {request.status === 'pending_approval' && 
+               (user?.role === 'admin' || user?.role === 'manager') && (
+                <button
+                  onClick={handleApproveMaintenance}
+                  disabled={isApproving}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 font-semibold"
+                >
+                  {isApproving ? t('loading') : t('approveMaintenance')}
+                </button>
+              )}
               {property && (
                 <Link
                   href={`/properties/${property.id}`}
