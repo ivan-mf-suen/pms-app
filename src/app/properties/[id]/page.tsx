@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useParams, useRouter } from 'next/navigation';
 import FloorMap from '@/components/FloorMap';
+import { useI18n } from '@/contexts/I18nContext';
 
 export default function PropertyDetailPage() { 
   const params = useParams();
   const router = useRouter();
+  const { t } = useI18n();
   const id = params.id as string;
   const property = mockProperties.find((p) => p.id === id);
   const tenant = mockTenants.find((t) => t.propertyId === id);
@@ -49,7 +51,7 @@ export default function PropertyDetailPage() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <a href="/properties" className="text-blue-600 hover:underline mb-4 block">
-            ← Back to Properties
+            ← {t('backToProperties')}
           </a>
           <h1 className="text-3xl font-bold text-gray-800">{property.address}</h1>
           <p className="text-gray-600 mt-1">
@@ -65,7 +67,7 @@ export default function PropertyDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Images */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="relative w-full h-96 bg-gray-200">
+              <div className="relative w-full h-150 bg-gray-200">
                 {property.imageUrl ? (
                   <Image
                     src={property.imageUrl}
@@ -77,44 +79,13 @@ export default function PropertyDetailPage() {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400">
-                    No image available
+                    {t('noImageAvailable')}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Property Details */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Property Details</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-600 text-sm">Property Type</p>
-                  <p className="font-semibold text-gray-800 capitalize">{property.type}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Status</p>
-                  <p className="font-semibold text-gray-800 capitalize">{property.status}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Bedrooms</p>
-                  <p className="font-semibold text-gray-800">{property.bedrooms}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Bathrooms</p>
-                  <p className="font-semibold text-gray-800">{property.bathrooms}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Square Feet</p>
-                  <p className="font-semibold text-gray-800">{property.squareFeet.toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Current Value</p>
-                  <p className="font-semibold text-gray-800">
-                    ${property.currentValue.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
+            
 
             {/* Floor Map Section */}
             <FloorMap
@@ -122,11 +93,147 @@ export default function PropertyDetailPage() {
               floorPlanUrl={property.floorPlanUrl}
               inventory={mockInventory}
             />
+              {/* Product Inventory Details */}
+            {propertyInventory.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-800">{t('productInventory')}</h2>
+                  <Link
+                    href="/inventory"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
+                  >
+                    {t('viewAll')} →
+                  </Link>
+                </div>
+                <div className="space-y-4">
+                  {propertyInventory.map((item) => {
+                    // Get locations for this property
+                    const locationForThisProperty = item.locations.filter((loc) => loc.propertyId === id);
+                    const firstLocation = locationForThisProperty[0];
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => router.push(`/inventory/${item.id}`)}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md hover:bg-blue-50 transition cursor-pointer"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">{t('inventoryType')}</p>
+                            <p className="font-semibold text-gray-800 capitalize">{item.type}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">{t('brandModel')}</p>
+                            <p className="font-semibold text-blue-600 hover:text-blue-800">
+                              {item.brand} {item.model}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">{t('location')}</p>
+                            <div>
+                              <p className="font-semibold text-gray-800">{firstLocation?.address}</p>
+                              {locationForThisProperty.length > 1 && (
+                                <p className="text-xs text-gray-500 mt-1">+{locationForThisProperty.length - 1} more location{locationForThisProperty.length - 1 !== 1 ? 's' : ''}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">{t('status')}</p>
+                            <span
+                              className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
+                                firstLocation?.status === 'active'
+                                  ? 'bg-green-100 text-green-800'
+                                  : firstLocation?.status === 'inactive'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {firstLocation?.status}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">{t('installDate')}</p>
+                            <p className="font-semibold text-gray-800">{firstLocation?.installDate}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 text-sm font-semibold">{t('warrantyEnd')}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-semibold text-gray-800">{firstLocation?.warrantyEnd}</p>
+                              {firstLocation && (
+                                <>
+                                  {isWarrantyExpired(firstLocation.warrantyEnd) ? (
+                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">
+                                      {t('expiredWarranty')}
+                                    </span>
+                                  ) : isWarrantyExpiring(firstLocation.warrantyEnd) ? (
+                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
+                                      {getWarrantyDaysRemaining(firstLocation.warrantyEnd)}d
+                                    </span>
+                                  ) : (
+                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">
+                                      {t('active')}
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-blue-600 text-xs mt-3 font-semibold">
+                          {t('viewDetails')} →
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-6 pt-4">
+                  <Link
+                    href="/inventory"
+                    className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                  >
+                    {t('viewAllPropertyInventory')} →
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            
+            {/* Property Details */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">{t('propertyDetails')}</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-600 text-sm">{t('propertyType')}</p>
+                  <p className="font-semibold text-gray-800 capitalize">{property.type}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">{t('status')}</p>
+                  <p className="font-semibold text-gray-800 capitalize">{property.status}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">{t('maintenanceRequests')}</p>
+                  <p className="font-semibold text-gray-800">{maintenanceRequests.length}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-sm">{t('squareFeet')}</p>
+                  <p className="font-semibold text-gray-800">{property.squareFeet.toLocaleString()}</p>
+                </div>
+                {/* <div>
+                  <p className="text-gray-600 text-sm">{t('currentValue')}</p>
+                  <p className="font-semibold text-gray-800">
+                    ${property.currentValue.toLocaleString()}
+                  </p>
+                </div> */}
+              </div>
+            </div>
 
             {/* Maintenance History */}
             {maintenanceRequests.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Maintenance Requests</h2>
+              <div className="bg-white rounded-lg shadow p-6 mt-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">{t('maintenanceRequests')}</h2>
                 <div className="space-y-4">
                   {maintenanceRequests.map((request) => (
                     <div
@@ -167,161 +274,13 @@ export default function PropertyDetailPage() {
                         </span>
                       </div>
                       <p className="text-blue-600 text-xs mt-3 font-semibold">
-                        View Details →
+                        {t('viewDetails')} →
                       </p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-
-            {/* Product Inventory Details */}
-            {propertyInventory.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-gray-800">Product Inventory</h2>
-                  <Link
-                    href="/inventory"
-                    className="text-blue-600 hover:text-blue-800 text-sm font-semibold"
-                  >
-                    View All Inventory →
-                  </Link>
-                </div>
-                <div className="space-y-4">
-                  {propertyInventory.map((item) => {
-                    // Get locations for this property
-                    const locationForThisProperty = item.locations.filter((loc) => loc.propertyId === id);
-                    const firstLocation = locationForThisProperty[0];
-
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => router.push(`/inventory/${item.id}`)}
-                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-400 hover:shadow-md hover:bg-blue-50 transition cursor-pointer"
-                      >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-gray-600 text-sm font-semibold">Type</p>
-                            <p className="font-semibold text-gray-800 capitalize">{item.type}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600 text-sm font-semibold">Brand / Model</p>
-                            <p className="font-semibold text-blue-600 hover:text-blue-800">
-                              {item.brand} {item.model}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600 text-sm font-semibold">Location</p>
-                            <div>
-                              <p className="font-semibold text-gray-800">{firstLocation?.address}</p>
-                              {locationForThisProperty.length > 1 && (
-                                <p className="text-xs text-gray-500 mt-1">+{locationForThisProperty.length - 1} more location{locationForThisProperty.length - 1 !== 1 ? 's' : ''}</p>
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            <p className="text-gray-600 text-sm font-semibold">Status</p>
-                            <span
-                              className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
-                                firstLocation?.status === 'active'
-                                  ? 'bg-green-100 text-green-800'
-                                  : firstLocation?.status === 'inactive'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
-                            >
-                              {firstLocation?.status}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="text-gray-600 text-sm font-semibold">Install Date</p>
-                            <p className="font-semibold text-gray-800">{firstLocation?.installDate}</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-600 text-sm font-semibold">Warranty End</p>
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-gray-800">{firstLocation?.warrantyEnd}</p>
-                              {firstLocation && (
-                                <>
-                                  {isWarrantyExpired(firstLocation.warrantyEnd) ? (
-                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800">
-                                      EXPIRED
-                                    </span>
-                                  ) : isWarrantyExpiring(firstLocation.warrantyEnd) ? (
-                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-yellow-100 text-yellow-800">
-                                      {getWarrantyDaysRemaining(firstLocation.warrantyEnd)}d
-                                    </span>
-                                  ) : (
-                                    <span className="inline-block px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">
-                                      Active
-                                    </span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-blue-600 text-xs mt-3 font-semibold">
-                          View Details →
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="mt-6 pt-4 border-t">
-                  <Link
-                    href="/inventory"
-                    className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
-                  >
-                    View All Property Inventory →
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            {/* Financial Summary */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Financial Summary</h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-gray-600 text-sm">Purchase Price</p>
-                  <p className="font-bold text-lg text-gray-800">
-                    ${property.purchasePrice.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm">Current Value</p>
-                  <p className="font-bold text-lg text-green-600">
-                    ${property.currentValue.toLocaleString()}
-                  </p>
-                </div>
-                <div className="pt-4 border-t">
-                  <p className="text-gray-600 text-sm">Equity Gain</p>
-                  <p className="font-bold text-lg text-green-600">
-                    ${(property.currentValue - property.purchasePrice).toLocaleString()}
-                  </p>
-                </div>
-                {tenant && (
-                  <>
-                    <div className="pt-4 border-t">
-                      <p className="text-gray-600 text-sm">Monthly Rent</p>
-                      <p className="font-bold text-lg text-gray-800">
-                        ${tenant.monthlyRent.toLocaleString()}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-600 text-sm">Annual Rent</p>
-                      <p className="font-bold text-lg text-blue-600">
-                        ${(tenant.monthlyRent * 12).toLocaleString()}
-                      </p>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
           </div>
         </div>
       </div>

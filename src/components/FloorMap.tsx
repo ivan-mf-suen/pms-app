@@ -130,7 +130,7 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory }: FloorM
       </div>
 
       {/* Inventory List Below Map */}
-      <div className="mt-6 border-t pt-4">
+      {/*<div className="mt-6 border-t pt-4">
         <h4 className="text-lg font-bold text-gray-800 mb-3">Inventory at This Location</h4>
         <div className="space-y-2">
           {propertyInventory.map((inv) =>
@@ -161,7 +161,7 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory }: FloorM
             ))
           )}
         </div>
-      </div>
+      </div>*/}
     </div>
   );
 }

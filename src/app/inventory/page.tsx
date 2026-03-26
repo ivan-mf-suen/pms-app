@@ -235,7 +235,6 @@ export default function InventoryPage() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('inventoryType')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('location')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Total Qty</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Property</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('installDate')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('warrantyEnd')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('status')}</th>
@@ -288,9 +287,8 @@ export default function InventoryPage() {
                             {item.locations.reduce((sum, loc) => sum + loc.quantity, 0)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-800">{property?.address || 'N/A'}</td>
-                        <td className="px-6 py-4 text-sm text-gray-800">{firstLocation.installDate}</td>
-                        <td className="px-6 py-4 text-sm">
+                        <td className="px-6 py-4 text-sm text-gray-500">{firstLocation.installDate}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
                           <div className="flex items-center gap-2">
                             <span>{firstLocation.warrantyEnd}</span>
                             {isExpired && (

@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/contexts/I18nContext';
 import { Property } from '@/lib/mockData';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +17,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function PropertyCard({ property }: PropertyCardProps) {
+  const { t } = useI18n();
   return (
     <Link href={`/properties/${property.id}`}>
       <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden cursor-pointer">
@@ -44,14 +46,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             {property.city}, {property.state} {property.zipCode}
           </p>
           <div className="flex gap-4 mt-3 text-sm text-gray-600">
-            <span>🛏️ {property.bedrooms} bed</span>
+            <span>🛏️ {property.bedrooms + property.bathrooms} bed</span>
             <span>🚿 {property.bathrooms} bath</span>
           </div>
           <div className="mt-3 pt-3 border-t">
             <p className="text-sm font-semibold text-gray-800">
               ${property.currentValue.toLocaleString()}
             </p>
-            <p className="text-xs text-gray-500 mt-1">Type: {property.type}</p>
+            <p className="text-xs text-gray-500 mt-1">{t('propertyType')}: {property.type}</p>
           </div>
         </div>
       </div>
