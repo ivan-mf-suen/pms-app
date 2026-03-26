@@ -22,6 +22,7 @@ export interface Property {
   currentValue: number;
   status: 'available' | 'occupied' | 'maintenance' | 'vacant';
   imageUrl?: string;
+  floorPlanUrl?: string; // floor map image for property detail
 }
 
 export interface Tenant {
@@ -69,6 +70,8 @@ export interface LocationInfo {
   installDate: string;
   warrantyEnd: string;
   status: 'active' | 'inactive' | 'retired';
+  x?: number; // position on floor map, 0-100 (percentage from left)
+  y?: number; // position on floor map, 0-100 (percentage from top)
 }
 
 export interface Inventory {
@@ -155,6 +158,7 @@ export const mockProperties: Property[] = [
     currentValue: 175000,
     status: 'occupied',
     imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop',
+    floorPlanUrl: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop',
   },
   {
     id: 'prop-002',
@@ -170,6 +174,7 @@ export const mockProperties: Property[] = [
     currentValue: 280000,
     status: 'occupied',
     imageUrl: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop',
+    floorPlanUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop',
   },
   {
     id: 'prop-003',
@@ -185,6 +190,7 @@ export const mockProperties: Property[] = [
     currentValue: 135000,
     status: 'available',
     imageUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop',
+    floorPlanUrl: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
   },
   {
     id: 'prop-004',
@@ -200,6 +206,7 @@ export const mockProperties: Property[] = [
     currentValue: 385000,
     status: 'occupied',
     imageUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=300&fit=crop',
+    floorPlanUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop',
   },
   {
     id: 'prop-005',
@@ -215,6 +222,7 @@ export const mockProperties: Property[] = [
     currentValue: 450000,
     status: 'occupied',
     imageUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=300&fit=crop',
+    floorPlanUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
   },
 ];
 
@@ -384,6 +392,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2019-05-15',
         warrantyEnd: '2026-05-15',
         status: 'active',
+        x: 10,
+        y: 80,
       },
     ],
   },
@@ -404,6 +414,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2020-08-20',
         warrantyEnd: '2026-08-20',
         status: 'active',
+        x: 75,
+        y: 70,
       },
       {
         id: 'loc-002-2',
@@ -415,6 +427,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2021-03-10',
         warrantyEnd: '2027-03-10',
         status: 'active',
+        x: 70,
+        y: 65,
       },
     ],
   },
@@ -435,6 +449,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2018-03-10',
         warrantyEnd: '2025-03-10',
         status: 'active',
+        x: 40,
+        y: 20,
       },
     ],
   },
@@ -455,6 +471,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2017-11-22',
         warrantyEnd: '2024-11-22',
         status: 'active',
+        x: 35,
+        y: 82,
       },
     ],
   },
@@ -474,6 +492,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2021-06-15',
         warrantyEnd: '2026-06-15',
         status: 'active',
+        x: 85,
+        y: 50,
       },
     ],
   },
@@ -493,6 +513,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2020-12-01',
         warrantyEnd: '2026-12-01',
         status: 'active',
+        x: 60,
+        y: 55,
       },
       {
         id: 'loc-006-2',
@@ -504,6 +526,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2021-01-15',
         warrantyEnd: '2027-01-15',
         status: 'active',
+        x: 88,
+        y: 48,
       },
     ],
   },
@@ -524,6 +548,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2022-02-14',
         warrantyEnd: '2027-02-14',
         status: 'active',
+        x: 85,
+        y: 75,
       },
     ],
   },
@@ -543,6 +569,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2019-09-05',
         warrantyEnd: '2026-09-05',
         status: 'active',
+        x: 20,
+        y: 35,
       },
     ],
   },
@@ -563,6 +591,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2018-07-30',
         warrantyEnd: '2025-07-30',
         status: 'active',
+        x: 50,
+        y: 15,
       },
     ],
   },
@@ -583,6 +613,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2019-01-12',
         warrantyEnd: '2026-01-12',
         status: 'active',
+        x: 55,
+        y: 18,
       },
     ],
   },
@@ -603,6 +635,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2021-04-22',
         warrantyEnd: '2026-04-22',
         status: 'active',
+        x: 28,
+        y: 78,
       },
     ],
   },
@@ -622,6 +656,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2020-09-10',
         warrantyEnd: '2025-09-10',
         status: 'active',
+        x: 25,
+        y: 38,
       },
     ],
   },
@@ -642,6 +678,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2019-06-05',
         warrantyEnd: '2026-06-05',
         status: 'active',
+        x: 32,
+        y: 85,
       },
     ],
   },
@@ -661,6 +699,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2022-01-18',
         warrantyEnd: '2027-01-18',
         status: 'active',
+        x: 45,
+        y: 45,
       },
     ],
   },
@@ -680,6 +720,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2021-10-30',
         warrantyEnd: '2026-10-30',
         status: 'active',
+        x: 62,
+        y: 58,
       },
     ],
   },
@@ -699,6 +741,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2020-03-15',
         warrantyEnd: '2025-03-15',
         status: 'active',
+        x: 22,
+        y: 40,
       },
     ],
   },
@@ -719,6 +763,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2022-08-25',
         warrantyEnd: '2027-08-25',
         status: 'active',
+        x: 50,
+        y: 50,
       },
     ],
   },
@@ -739,6 +785,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2021-05-11',
         warrantyEnd: '2026-05-11',
         status: 'active',
+        x: 78,
+        y: 72,
       },
     ],
   },
@@ -758,6 +806,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2020-10-08',
         warrantyEnd: '2025-10-08',
         status: 'active',
+        x: 76,
+        y: 68,
       },
     ],
   },
@@ -777,6 +827,8 @@ export const mockInventory: Inventory[] = [
         installDate: '2021-02-20',
         warrantyEnd: '2026-02-20',
         status: 'active',
+        x: 65,
+        y: 60,
       },
     ],
   },

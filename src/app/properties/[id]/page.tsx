@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useParams, useRouter } from 'next/navigation';
+import FloorMap from '@/components/FloorMap';
 
 export default function PropertyDetailPage() { 
   const params = useParams();
@@ -115,34 +116,12 @@ export default function PropertyDetailPage() {
               </div>
             </div>
 
-            {/* Tenant Information */}
-            {tenant && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Tenant Information</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <p className="text-gray-600 text-sm">Name</p>
-                    <p className="font-semibold text-gray-800">{tenant.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 text-sm">Email</p>
-                    <p className="font-semibold text-gray-800">{tenant.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 text-sm">Phone</p>
-                    <p className="font-semibold text-gray-800">{tenant.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 text-sm">Monthly Rent</p>
-                    <p className="font-semibold text-gray-800">${tenant.monthlyRent.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 text-sm">Status</p>
-                    <p className="font-semibold text-gray-800 capitalize">{tenant.status}</p>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Floor Map Section */}
+            <FloorMap
+              propertyId={property.id}
+              floorPlanUrl={property.floorPlanUrl}
+              inventory={mockInventory}
+            />
 
             {/* Maintenance History */}
             {maintenanceRequests.length > 0 && (
