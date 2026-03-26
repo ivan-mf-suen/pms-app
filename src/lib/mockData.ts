@@ -1181,21 +1181,21 @@ export const mockNotifications: Notification[] = [
 export const mockUsers: User[] = [
   {
     id: 'user-001',
-    email: 'admin@pms.com',
+    email: 'ivan.mf.suen@poleungkuk.org.hk',
     password: 'admin123',
     name: 'Admin User',
     role: 'admin',
   },
   {
     id: 'user-002',
-    email: 'manager@pms.com',
+    email: 'manager@poleungkuk.org.hk',
     password: 'manager123',
     name: 'Property Manager',
     role: 'manager',
   },
   {
     id: 'user-003',
-    email: 'demo@pms.com',
+    email: 'demo@poleungkuk.org.hk',
     password: 'demo123',
     name: 'Demo User',
     role: 'user',

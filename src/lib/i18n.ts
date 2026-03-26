@@ -246,6 +246,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     activeTenants: 'Active Tenants',
     currentlyLeasing: 'Currently leasing',
     maintenanceIssues: 'Maintenance Issues',
+    expiredWarrantyItems: 'Expired Warranty Items',
+    expiredWarranties: 'Items with expired warranties',
 
     // Messages
     confirmDelete: 'Are you sure you want to delete this item?',
@@ -258,7 +260,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
 
   'zh-Hant': {
     // Navigation
-    dashboard: '儀表板',
+    dashboard: '監察板',
     properties: '資產',
     inventory: '庫存',
     workOrders: '工作單',
@@ -482,10 +484,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     totalOverdue: '總逾期',
 
     // Dashboard
-    dashboardTitle: '儀表板',
+    dashboardTitle: '監察板',
     overview: '概覽',
     recentActivity: '最近活動',
-    featuredProperties: '特色資產',
+    featuredProperties: '資產',
     recentMaintenanceRequests: '最近維護請求',
     quickStats: '快速統計',
     welcomeMessage: '歡迎回到您的資產管理系統',
@@ -495,6 +497,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     activeTenants: '活躍租戶',
     currentlyLeasing: '正在出租',
     maintenanceIssues: '維護問題',
+    expiredWarrantyItems: '已過期保修項目',
+    expiredWarranties: '保修期已過期的項目',
 
     // Messages
     confirmDelete: '您確定要刪除此項目嗎？',

@@ -10,10 +10,22 @@ import {
   mockTenants,
   mockMaintenanceRequests,
   mockPayments,
+  mockInventory,
 } from '@/lib/mockData';
+import Link from 'next/link';
 
 export default function Home() {
   const { t } = useI18n();
+  
+  // Helper function to check if warranty is expired
+  const isWarrantyExpired = (warrantyEnd: string): boolean => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const warranty = new Date(warrantyEnd);
+    warranty.setHours(0, 0, 0, 0);
+    return warranty.getTime() < today.getTime();
+  };
+  
   // Calculate statistics
   const totalProperties = mockProperties.length;
   const occupiedProperties = mockProperties.filter((p) => p.status === 'occupied').length;
@@ -21,6 +33,11 @@ export default function Home() {
   const totalMonthlyRent = mockTenants.reduce((sum, t) => sum + t.monthlyRent, 0);
   const maintenanceIssues = mockMaintenanceRequests.filter((r) => r.status !== 'completed').length;
   const pendingPayments = mockPayments.filter((p) => p.status === 'pending' || p.status === 'overdue').length;
+  
+  // Count expired warranty items
+  const expiredWarrantyCount = mockInventory.filter((item) =>
+    item.locations.some((loc) => isWarrantyExpired(loc.warrantyEnd))
+  ).length;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -42,18 +59,20 @@ export default function Home() {
             subtext={`${occupiedProperties} ${t('occupied')}`}
             icon="🏢"
           />
-          <StatCard
-            label={t('portfolioValue')}
-            value={`$${(totalPortfolioValue / 1000000).toFixed(2)}M`}
-            subtext={t('totalAssetValue')}
-            icon="💰"
-          />
            <StatCard
             label={t('maintenanceIssues')}
             value={maintenanceIssues}
             subtext={`${mockMaintenanceRequests.filter((r) => (r.priority === 'urgent' || r.priority === 'high') && r.status !== 'completed').length} ${t('urgent')}`}
             icon="🔧"
           />
+          <Link href="/inventory?warranty=expired" className="block">
+            <StatCard
+              label={t('expiredWarrantyItems')}
+              value={expiredWarrantyCount}
+              subtext={t('expiredWarranties')}
+              icon="⚠️"
+            />
+          </Link>
         </div>
 
         {/* Main Grid */}

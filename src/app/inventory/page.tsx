@@ -3,15 +3,24 @@
 import { useI18n } from '@/contexts/I18nContext';
 import { mockInventory, mockProperties } from '@/lib/mockData';
 import { exportToExcel, downloadCSV, generateCSV, ExportColumn } from '@/lib/exportUtils';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function InventoryPage() {
   const { t } = useI18n();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [filterProperty, setFilterProperty] = useState<string>('all');
   const [filterWarranty, setFilterWarranty] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
+
+  // Set warranty filter from query params on mount
+  useEffect(() => {
+    const warrantyParam = searchParams.get('warranty');
+    if (warrantyParam === 'expired') {
+      setFilterWarranty('expired');
+    }
+  }, [searchParams]);
 
   // Calculate warranty days remaining
   const getWarrantyDaysRemaining = (warrantyEnd: string): number => {
