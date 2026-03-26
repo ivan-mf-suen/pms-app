@@ -392,7 +392,7 @@ export const mockInventory: Inventory[] = [
         installDate: '2019-05-15',
         warrantyEnd: '2026-05-15',
         status: 'active',
-        x: 30,
+        x: 10,
         y: 80,
       },
     ],
