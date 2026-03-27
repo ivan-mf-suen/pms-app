@@ -344,6 +344,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     propertyType_house: '獨棟',
     propertyType_commercial: '商業',
     propertyType_duplex: '透天',
+    propertyType_secondaryschool: '中學',
+    propertyType_kindergarten: '幼稚園',
     manageAllProperties: '一站式管理您的所有資產',
     noPropertiesFound: '找不到資產',
     backToProperties: '返回資產',

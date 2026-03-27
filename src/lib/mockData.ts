@@ -14,7 +14,7 @@ export interface Property {
   city: string;
   state: string;
   zipCode: string;
-  type: 'apartment' | 'house' | 'commercial' | 'duplex' | 'kindergarten' | 'secondary-school';
+  type: 'kindergarten' | 'secondaryschool';
   bedrooms: number;
   bathrooms: number;
   squareFeet: number;
@@ -173,7 +173,7 @@ export const mockProperties: Property[] = [
     city: '荃灣柴灣角荃景圍安賢街12-20號',
     state: '新界',
     zipCode: '',
-    type: 'secondary-school',
+    type: 'secondaryschool',
     bedrooms: 0,
     bathrooms: 0,
     squareFeet: 83528,

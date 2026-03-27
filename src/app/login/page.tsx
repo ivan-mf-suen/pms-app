@@ -210,15 +210,15 @@ export default function LoginPage() {
                 Demo accounts (development only):
               </p>
               <div className="bg-yellow-50 border border-yellow-200 p-3 rounded text-yellow-800">
-                <p className="font-mono text-xs mb-1">admin@pms.com / admin123</p>
+                <p className="font-mono text-xs mb-1">ivan.mf.suen@poleungkuk.org.hk/ admin123</p>
                 <p className="text-yellow-700 text-xs">Admin</p>
               </div>
               <div className="bg-yellow-50 border border-yellow-200 p-3 rounded text-yellow-800">
-                <p className="font-mono text-xs mb-1">manager@pms.com / manager123</p>
+                <p className="font-mono text-xs mb-1">manager@poleungkuk.org.hk / manager123</p>
                 <p className="text-yellow-700 text-xs">Property Manager</p>
               </div>
               <div className="bg-yellow-50 border border-yellow-200 p-3 rounded text-yellow-800">
-                <p className="font-mono text-xs mb-1">demo@pms.com / demo123</p>
+                <p className="font-mono text-xs mb-1">demo@poleungkuk.org.hk / demo123</p>
                 <p className="text-yellow-700 text-xs">Demo User</p>
               </div>
             </div>

@@ -153,10 +153,6 @@ export default function CreateMaintenancePage() {
                 <p className="text-gray-800">{location.address}</p>
               </div>
               <div>
-                <p className="text-blue-700 font-semibold">Property</p>
-                <p className="text-gray-800">{property.address}</p>
-              </div>
-              <div>
                 <p className="text-blue-700 font-semibold">Warranty End</p>
                 <p className="text-gray-800">{location.warrantyEnd}</p>
               </div>
@@ -225,7 +221,7 @@ export default function CreateMaintenancePage() {
           {/* Estimated Cost */}
           <div>
             <label htmlFor="estimatedCost" className="block text-gray-700 font-semibold mb-2">
-              {t('estimatedCost')} (USD) <span className="text-red-500">*</span>
+              {t('estimatedCost')} (HKD) <span className="text-red-500">*</span>
             </label>
             <input
               type="number"

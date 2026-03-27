@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 
-const propertyTypes = ['apartment', 'house', 'commercial', 'duplex', 'kindergarten', 'secondary-school'];
+const propertyTypes = ['kindergarten', 'secondaryschool'];
 const propertyStatuses = ['available', 'occupied', 'maintenance', 'vacant'];
 
 export default function CreatePropertyPage() {

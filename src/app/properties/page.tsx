@@ -46,19 +46,19 @@ export default function PropertiesPage() {
       </div>
 
       {/* Content */}
+       
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Actions */}
+        {(user?.role === 'admin' || user?.role === 'manager') && (
         <div className="bg-white rounded-lg shadow p-4 mb-6 flex justify-between items-center">
           <h2 className="text-lg font-bold text-gray-800">{t('manageAllProperties')}</h2>
-          {(user?.role === 'admin' || user?.role === 'manager') && (
-            <Link
-              href="/properties/create"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
-            >
-              + {t('create')} {t('properties')}
-            </Link>
-          )}
-        </div>
+          <Link
+            href="/properties/create"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+          >
+            + {t('create')} {t('properties')}
+          </Link>
+        </div> 
+        )}
 
         {/* Filter */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
