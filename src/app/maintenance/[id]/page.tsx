@@ -62,6 +62,46 @@ export default function MaintenanceDetailPage() {
     
     setIsApproving(true);
     try {
+      // Update maintenance request status to "approved"
+      const approvedRequest = {
+        ...request,
+        status: 'approved' as const,
+        approvedBy: user.name,
+        approvedDate: new Date().toISOString().split('T')[0],
+      };
+      
+      // Save updated maintenance request
+      const savedMRs = localStorage.getItem('maintenanceRequests');
+      const maintenanceRequests = savedMRs ? JSON.parse(savedMRs) : [];
+      const index = maintenanceRequests.findIndex((r: any) => r.id === request.id);
+      if (index >= 0) {
+        maintenanceRequests[index] = approvedRequest;
+      } else {
+        maintenanceRequests.push(approvedRequest);
+      }
+      localStorage.setItem('maintenanceRequests', JSON.stringify(maintenanceRequests));
+      
+      // Update request state
+      Object.assign(request, approvedRequest);
+      
+      // Show success message
+      alert(t('approveMaintenance') + ' - ' + t('success'));
+      
+      // Reload the page to show updated status
+      window.location.reload();
+    } catch (error) {
+      console.error('Error approving maintenance:', error);
+      alert(t('error'));
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  const handleCreateWorkOrder = async () => {
+    if (!user || !(user.role === 'admin' || user.role === 'manager')) return;
+    
+    setIsApproving(true);
+    try {
       // Generate work order
       const controlNumber = `WO-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
       const newWorkOrder = {
@@ -89,12 +129,9 @@ export default function MaintenanceDetailPage() {
       workOrders.push(newWorkOrder);
       localStorage.setItem('workOrders', JSON.stringify(workOrders));
       
-      // Update maintenance request
-      const approvedRequest = {
+      // Update maintenance request with work order link
+      const updatedRequest = {
         ...request,
-        status: 'open' as const,
-        approvedBy: user.name,
-        approvedDate: new Date().toISOString().split('T')[0],
         workOrderId: newWorkOrder.id,
       };
       
@@ -103,17 +140,17 @@ export default function MaintenanceDetailPage() {
       const maintenanceRequests = savedMRs ? JSON.parse(savedMRs) : [];
       const index = maintenanceRequests.findIndex((r: any) => r.id === request.id);
       if (index >= 0) {
-        maintenanceRequests[index] = approvedRequest;
+        maintenanceRequests[index] = updatedRequest;
       } else {
-        maintenanceRequests.push(approvedRequest);
+        maintenanceRequests.push(updatedRequest);
       }
       localStorage.setItem('maintenanceRequests', JSON.stringify(maintenanceRequests));
       
-      // Show success and redirect
-      alert(t('approveMaintenance') + ' - ' + t('success'));
-      router.push(`/work-orders/${newWorkOrder.id}`);
+      // Show success and redirect to work orders list
+      alert(t('success') + ': ' + newWorkOrder.controlNumber);
+      router.push(`/work-orders`);
     } catch (error) {
-      console.error('Error approving maintenance:', error);
+      console.error('Error creating work order:', error);
       alert(t('error'));
     } finally {
       setIsApproving(false);
@@ -143,6 +180,15 @@ export default function MaintenanceDetailPage() {
     medium: 'bg-yellow-100 text-yellow-800',
     high: 'bg-orange-100 text-orange-800',
     urgent: 'bg-red-100 text-red-800',
+  };
+
+  const maintenanceStatusColors: Record<string, string> = {
+    pending_approval: 'bg-yellow-100 text-yellow-800',
+    approved: 'bg-green-100 text-green-800',
+    open: 'bg-blue-100 text-blue-800',
+    in_progress: 'bg-purple-100 text-purple-800',
+    completed: 'bg-green-100 text-green-800',
+    canceled: 'bg-gray-100 text-gray-800',
   };
 
   // Calculate cost status
@@ -175,7 +221,7 @@ export default function MaintenanceDetailPage() {
               </span>
               <span
                 className={`inline-block px-4 py-2 rounded-lg text-sm font-semibold ${
-                  statusColors[request.status]
+                  maintenanceStatusColors[request.status]
                 }`}
               >
                 {t(`maintenanceStatus_${request.status}`)}
@@ -370,6 +416,29 @@ export default function MaintenanceDetailPage() {
                 >
                   {isApproving ? t('loading') : t('approveMaintenance')}
                 </button>
+              )}
+              {request.status === 'approved' && 
+               (user?.role === 'admin' || user?.role === 'manager') && 
+               !request.workOrderId && (
+                <Link
+                  href={`/work-orders/create?maintenanceId=${request.id}`}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+                >
+                  + {t('createWorkOrder')}
+                </Link>
+              )}
+              {request.status === 'approved' && request.approvedBy && (
+                <div className="px-4 py-2 bg-green-100 text-green-800 rounded-lg font-semibold">
+                  {t('approvedBy')}: {request.approvedBy}
+                </div>
+              )}
+              {request.workOrderId && (
+                <Link
+                  href={`/work-orders/${request.workOrderId}`}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
+                >
+                  {t('linkedWorkOrder')} →
+                </Link>
               )}
               {property && (
                 <Link

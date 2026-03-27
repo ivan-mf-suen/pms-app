@@ -61,7 +61,7 @@ export default function InventoryDetailPage() {
             href="/inventory"
             className="text-blue-600 hover:underline mb-4 block"
           >
-            ← Back to Inventory
+            ← {t('back')} {t('inventory')}
           </Link>
           <div className="flex justify-between items-start gap-4">
             <div>
@@ -74,10 +74,10 @@ export default function InventoryDetailPage() {
               <span
                 className={`inline-block px-4 py-2 rounded-lg text-sm font-semibold bg-blue-100 text-blue-800`}
               >
-                {item.type.toUpperCase()}
+                {t(`type_${item.type}`)}
               </span>
               <span className="inline-block px-4 py-2 rounded-lg text-sm font-semibold bg-purple-100 text-purple-800">
-                Total: {totalQuantity} unit{totalQuantity !== 1 ? 's' : ''}
+                {t('total')}: {totalQuantity} unit{totalQuantity !== 1 ? 's' : ''}
               </span>
             </div>
           </div>
@@ -88,28 +88,28 @@ export default function InventoryDetailPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="space-y-6">
           {/* Basic Information */}
-          <div className="bg-white rounded-lg shadow p-6">{t('basicInformation')}
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Basic Information</h2>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">{t('basicInformation')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <p className="text-gray-600 text-sm font-semibold mb-2">Brand</p>
+                <p className="text-gray-600 text-sm font-semibold mb-2">{t('brand')}</p>
                 <p className="font-semibold text-gray-800">{item.brand}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm font-semibold mb-2">Model</p>
+                <p className="text-gray-600 text-sm font-semibold mb-2">{t('model')}</p>
                 <p className="font-semibold text-gray-800">{item.model}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm font-semibold mb-2">Type</p>
-                <p className="font-semibold text-gray-800 capitalize">{item.type}</p>
+                <p className="text-gray-600 text-sm font-semibold mb-2">{t('inventoryType')}</p>
+                <p className="font-semibold text-gray-800">{t(`type_${item.type}`)}</p>
               </div>
               <div>
-                <p className="text-gray-600 text-sm font-semibold mb-2">Total Quantity</p>
+                <p className="text-gray-600 text-sm font-semibold mb-2">{t('quantity')}</p>
                 <p className="font-semibold text-gray-800">{totalQuantity} unit{totalQuantity !== 1 ? 's' : ''}</p>
               </div>
               {item.hp && (
                 <div>
-                  <p className="text-gray-600 text-sm font-semibold mb-2">Horsepower (HP)</p>
+                  <p className="text-gray-600 text-sm font-semibold mb-2">{t('hp')}</p>
                   <p className="font-semibold text-gray-800">{item.hp} HP</p>
                 </div>
               )}
@@ -136,7 +136,7 @@ export default function InventoryDetailPage() {
                       {/* Location Header */}
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <p className="text-gray-600 text-sm font-semibold mb-1">Location {index + 1}</p>
+                          <p className="text-gray-600 text-sm font-semibold mb-1">{t('location')} {index + 1}</p>
                           <p className="font-semibold text-gray-800 text-lg">{location.address}</p>
                           {locationProperty && (
                             <Link
@@ -144,7 +144,7 @@ export default function InventoryDetailPage() {
                               className="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-block"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              View Property Details →
+                              {t('viewProperty')} →
                             </Link>
                           )}
                         </div>
@@ -156,7 +156,7 @@ export default function InventoryDetailPage() {
 
                       {/* Status Badge */}
                       <div className="pt-2">
-                        <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">Status</p>
+                        <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">{t('status')}</p>
                         <span
                           className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
                             location.status === 'active'
@@ -173,28 +173,28 @@ export default function InventoryDetailPage() {
                       {/* Warranty & Installation Info */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t">
                         <div>
-                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">Install Date</p>
+                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">{t('installDate')}</p>
                           <p className="font-semibold text-gray-800">{location.installDate}</p>
                         </div>
                         <div>
-                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">Warranty End</p>
+                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">{t('warrantyEnd')}</p>
                           <p className="font-semibold text-gray-800">{location.warrantyEnd}</p>
                         </div>
                         <div>
-                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">Warranty Status</p>
+                          <p className="text-gray-600 text-xs font-semibold mb-1 uppercase">{t('warrantyStatus')}</p>
                           {isExpired ? (
                             <span className="inline-block px-3 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold">
-                              EXPIRED
+                              {t('expiredWarranty')}
                             </span>
                           ) : isExpiring ? (
                             <div className="flex items-center gap-1">
                               <span className="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-semibold">
-                                {daysRemaining}d Left
+                                {daysRemaining}d {t('left')}
                               </span>
                             </div>
                           ) : (
                             <span className="inline-block px-3 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">
-                              ACTIVE
+                              {t('active')}
                             </span>
                           )}
                         </div>
@@ -234,7 +234,7 @@ export default function InventoryDetailPage() {
 
           {/* Actions */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Actions</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">{t('actions')}</h2>
             <div className="flex gap-4 flex-wrap">
               {item.locations.some((loc) => isWarrantyExpired(loc.warrantyEnd)) && (
                 <button
@@ -250,14 +250,14 @@ export default function InventoryDetailPage() {
                   }}
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold"
                 >
-                  Create Maintenance Request
+                  {t('createMaintenance')}
                 </button>
               )}
               <Link
                 href="/inventory"
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
               >
-                Back to Inventory List
+                {t('backTo')} {t('inventory')}
               </Link>
             </div>
           </div>

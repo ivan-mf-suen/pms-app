@@ -47,7 +47,6 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           </p>
           <div className="flex gap-4 mt-3 text-sm text-gray-600">
             <span>🛏️ {property.bedrooms + property.bathrooms} bed</span>
-            <span>🚿 {property.bathrooms} bath</span>
           </div>
           <div className="mt-3 pt-3 border-t">
             <p className="text-sm font-semibold text-gray-800">

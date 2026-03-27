@@ -43,7 +43,7 @@ export interface MaintenanceRequest {
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
-  status: 'pending_approval' | 'open' | 'in_progress' | 'completed' | 'canceled';
+  status: 'pending_approval' | 'approved' | 'open' | 'in_progress' | 'completed' | 'canceled';
   createdDate: string;
   completedDate?: string;
   estimatedCost: number;
@@ -135,6 +135,7 @@ export interface Document {
   base64Content?: string;
   propertyId?: string;
   workOrderId?: string;
+  maintenanceId?: string;
   uploadDate: string;
 }
 

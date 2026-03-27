@@ -1,13 +1,70 @@
 'use client';
 
 import { useI18n } from '@/contexts/I18nContext';
-import { mockDocuments } from '@/lib/mockData';
-import { useState } from 'react';
+import { mockDocuments, mockProperties, mockMaintenanceRequests, mockWorkOrders } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
 
 export default function DocumentsPage() {
   const { t } = useI18n();
   const [documents, setDocuments] = useState(mockDocuments);
   const [fileName, setFileName] = useState('');
+  const [selectedProperty, setSelectedProperty] = useState('');
+  const [selectedMaintenance, setSelectedMaintenance] = useState('');
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState('');
+
+  // Fetch maintenance requests from both mockData and localStorage
+  const getAllMaintenanceRequests = () => {
+    const saved = localStorage.getItem('maintenanceRequests');
+    const local = saved ? JSON.parse(saved) : [];
+    const merged = [...mockMaintenanceRequests];
+    local.forEach((m: any) => {
+      const index = merged.findIndex(item => item.id === m.id);
+      if (index >= 0) {
+        merged[index] = m;
+      } else {
+        merged.push(m);
+      }
+    });
+    return merged;
+  };
+
+  // Fetch work orders from both mockData and localStorage
+  const getAllWorkOrders = () => {
+    const saved = localStorage.getItem('workOrders');
+    const local = saved ? JSON.parse(saved) : [];
+    const merged = [...mockWorkOrders];
+    local.forEach((w: any) => {
+      const index = merged.findIndex(item => item.id === w.id);
+      if (index >= 0) {
+        merged[index] = w;
+      } else {
+        merged.push(w);
+      }
+    });
+    return merged;
+  };
+
+  // Load documents from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('documents');
+    if (saved) {
+      try {
+        const localDocs = JSON.parse(saved);
+        const merged = [...mockDocuments];
+        localDocs.forEach((doc: any) => {
+          const index = merged.findIndex(d => d.id === doc.id);
+          if (index >= 0) {
+            merged[index] = doc;
+          } else {
+            merged.push(doc);
+          }
+        });
+        setDocuments(merged);
+      } catch (e) {
+        console.error('Error loading documents from localStorage:', e);
+      }
+    }
+  }, []);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,7 +80,7 @@ export default function DocumentsPage() {
     }
 
     // Mock file upload - in production, would upload to S3
-    const newDoc = {
+    const newDoc: any = {
       id: `doc-${Date.now()}`,
       name: fileName,
       size: Math.floor(Math.random() * 5000000) + 100000,
@@ -31,8 +88,22 @@ export default function DocumentsPage() {
       uploadDate: new Date().toISOString().split('T')[0],
     };
 
-    setDocuments([...documents, newDoc]);
+    // Add optional relationships
+    if (selectedProperty) newDoc.propertyId = selectedProperty;
+    if (selectedMaintenance) newDoc.maintenanceId = selectedMaintenance;
+    if (selectedWorkOrder) newDoc.workOrderId = selectedWorkOrder;
+
+    const updatedDocs = [...documents, newDoc];
+    setDocuments(updatedDocs);
+
+    // Save to localStorage
+    localStorage.setItem('documents', JSON.stringify(updatedDocs));
+
+    // Reset form
     setFileName('');
+    setSelectedProperty('');
+    setSelectedMaintenance('');
+    setSelectedWorkOrder('');
     (document.querySelector('input[type="file"]') as HTMLInputElement).value = '';
   };
 
@@ -76,26 +147,52 @@ export default function DocumentsPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Link to Property (Optional)</label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <select
+                  value={selectedProperty}
+                  onChange={(e) => setSelectedProperty(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
                   <option value="">None</option>
-                  <option value="prop-001">123 Oak Street</option>
-                  <option value="prop-002">456 Maple Avenue</option>
-                  <option value="prop-003">789 Pine Road</option>
-                  <option value="prop-004">321 Elm Street</option>
-                  <option value="prop-005">654 Cedar Lane</option>
+                  {mockProperties.map((prop) => (
+                    <option key={prop.id} value={prop.id}>
+                      {prop.address}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">Link to Maintenance Request (Optional)</label>
+                <select
+                  value={selectedMaintenance}
+                  onChange={(e) => setSelectedMaintenance(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="">None</option>
+                  {getAllMaintenanceRequests().map((mr) => (
+                    <option key={mr.id} value={mr.id}>
+                      {mr.title} ({mr.id})
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Link to Work Order (Optional)</label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <select
+                  value={selectedWorkOrder}
+                  onChange={(e) => setSelectedWorkOrder(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                >
                   <option value="">None</option>
-                  <option value="wo-001">WO-2026-0001</option>
-                  <option value="wo-002">WO-2026-0002</option>
-                  <option value="wo-003">WO-2026-0003</option>
+                  {getAllWorkOrders().map((wo) => (
+                    <option key={wo.id} value={wo.id}>
+                      {wo.controlNumber} ({wo.id})
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -121,6 +218,7 @@ export default function DocumentsPage() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('fileName')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('fileSize')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('fileType')}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Relationships</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('uploadDate')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('actions')}</th>
                 </tr>
@@ -128,12 +226,16 @@ export default function DocumentsPage() {
               <tbody className="divide-y">
                 {documents.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                       No documents uploaded yet.
                     </td>
                   </tr>
                 ) : (
-                  documents.map((doc) => (
+                  documents.map((doc: any) => {
+                    const property = mockProperties.find((p) => p.id === doc.propertyId);
+                    const maintenance = getAllMaintenanceRequests().find((m) => m.id === doc.maintenanceId);
+                    const workOrder = getAllWorkOrders().find((w) => w.id === doc.workOrderId);
+                    return (
                     <tr key={doc.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-semibold text-gray-800">{doc.name}</td>
                       <td className="px-6 py-4 text-sm text-gray-800">{formatFileSize(doc.size)}</td>
@@ -141,6 +243,28 @@ export default function DocumentsPage() {
                         <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs font-semibold">
                           {doc.type}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="space-y-1">
+                          {property && (
+                            <div className="text-xs text-gray-600">
+                              <span className="font-semibold">Property:</span> {property.address}
+                            </div>
+                          )}
+                          {maintenance && (
+                            <div className="text-xs text-gray-600">
+                              <span className="font-semibold">Maintenance:</span> {maintenance.title}
+                            </div>
+                          )}
+                          {workOrder && (
+                            <div className="text-xs text-gray-600">
+                              <span className="font-semibold">Work Order:</span> {workOrder.controlNumber}
+                            </div>
+                          )}
+                          {!property && !maintenance && !workOrder && (
+                            <span className="text-xs text-gray-400">No relationships</span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-800">{doc.uploadDate}</td>
                       <td className="px-6 py-4 text-sm">
@@ -152,7 +276,8 @@ export default function DocumentsPage() {
                         </button>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>

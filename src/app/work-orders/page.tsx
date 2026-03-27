@@ -11,6 +11,29 @@ export default function WorkOrdersPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterProperty, setFilterProperty] = useState<string>('all');
 
+  // Merge mockData with localStorage work orders
+  const getAllWorkOrders = () => {
+    const savedWOs = localStorage.getItem('workOrders');
+    const localWOs = savedWOs ? JSON.parse(savedWOs) : [];
+    
+    // Merge and deduplicate: localStorage items are newer, so use them if they exist
+    const merged = [...mockWorkOrders];
+    const mergedIds = new Set(merged.map(wo => wo.id));
+    
+    localWOs.forEach((wo: any) => {
+      const index = merged.findIndex(m => m.id === wo.id);
+      if (index >= 0) {
+        // Update existing with localStorage version (newer)
+        merged[index] = wo;
+      } else {
+        // Add new work orders from localStorage
+        merged.push(wo);
+      }
+    });
+    
+    return merged;
+  };
+
   // Calculate cumulative and check threshold
   const getCumulativeAndThreshold = (wo: any) => {
     const cumulative =
@@ -21,7 +44,7 @@ export default function WorkOrdersPage() {
   };
 
   // Filter work orders
-  let filtered = mockWorkOrders;
+  let filtered = getAllWorkOrders();
 
   if (filterStatus !== 'all') {
     filtered = filtered.filter((wo) => wo.status === filterStatus);

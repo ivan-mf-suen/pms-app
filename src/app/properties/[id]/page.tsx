@@ -8,6 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 import FloorMap from '@/components/FloorMap';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
 
 export default function PropertyDetailPage() { 
   const params = useParams();
@@ -15,7 +16,38 @@ export default function PropertyDetailPage() {
   const { t } = useI18n();
   const { user } = useAuth();
   const id = params.id as string;
-  const property = mockProperties.find((p) => p.id === id);
+  const [property, setProperty] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Check localStorage first for newly created properties
+      const savedProperties = JSON.parse(localStorage.getItem('properties') || '[]');
+      const foundSaved = savedProperties.find((p: any) => p.id === id);
+      if (foundSaved) {
+        setProperty(foundSaved);
+        setIsLoading(false);
+        return;
+      }
+    }
+    // Fallback to mockProperties
+    const foundMock = mockProperties.find((p) => p.id === id);
+    setProperty(foundMock);
+    setIsLoading(false);
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-lg text-gray-600">{t('loading')}</p>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return notFound();
+  }
+
   const tenant = mockTenants.find((t) => t.propertyId === id);
   const maintenanceRequests = mockMaintenanceRequests.filter(
     (r) => r.propertyId === id
@@ -23,10 +55,6 @@ export default function PropertyDetailPage() {
   const propertyInventory = mockInventory.filter(
     (inv) => inv.locations.some((loc) => loc.propertyId === id)
   );
-
-  if (!property) {
-    notFound();
-  }
 
   // Warranty calculation helper
   const getWarrantyDaysRemaining = (warrantyEnd: string): number => {
@@ -122,7 +150,7 @@ export default function PropertyDetailPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <p className="text-gray-600 text-sm font-semibold">{t('inventoryType')}</p>
-                            <p className="font-semibold text-gray-800 capitalize">{item.type}</p>
+                            <p className="font-semibold text-gray-800">{t(`type_${item.type}`)}</p>
                           </div>
                           <div>
                             <p className="text-gray-600 text-sm font-semibold">{t('brandModel')}</p>

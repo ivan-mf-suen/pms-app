@@ -138,26 +138,26 @@ export default function CreateMaintenancePage() {
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
           {/* Inventory Summary */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="font-semibold text-blue-900 mb-3">Inventory Item Summary</h3>
+            <h3 className="font-semibold text-blue-900 mb-3">{t('inventoryItemSummary')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-blue-700 font-semibold">Brand/Model</p>
+                <p className="text-blue-700 font-semibold">{t('brandModel')}</p>
                 <p className="text-gray-800">{inventory.brand} {inventory.model}</p>
               </div>
               <div>
-                <p className="text-blue-700 font-semibold">Type</p>
-                <p className="text-gray-800 capitalize">{inventory.type}</p>
+                <p className="text-blue-700 font-semibold">{t('inventoryType')}</p>
+                <p className="text-gray-800 capitalize">{t(`type_${inventory.type}`)}</p>
               </div>
               <div>
-                <p className="text-blue-700 font-semibold">Location</p>
+                <p className="text-blue-700 font-semibold">{t('location')}</p>
                 <p className="text-gray-800">{location.address}</p>
               </div>
               <div>
-                <p className="text-blue-700 font-semibold">Warranty End</p>
+                <p className="text-blue-700 font-semibold">{t('warrantyEnd')}</p>
                 <p className="text-gray-800">{location.warrantyEnd}</p>
               </div>
               <div>
-                <p className="text-blue-700 font-semibold">Condition</p>
+                <p className="text-blue-700 font-semibold">{t('condition')}</p>
                 <p className="text-gray-800 capitalize">{location.condition || 'N/A'}</p>
               </div>
             </div>

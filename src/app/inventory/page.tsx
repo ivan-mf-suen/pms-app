@@ -79,8 +79,8 @@ export default function InventoryPage() {
       { key: 'hp', label: t('hp') },
       { key: 'type', label: t('inventoryType') },
       { key: 'location', label: t('location') },
-      { key: 'quantity', label: 'Quantity' },
-      { key: 'totalQuantity', label: 'Total Quantity' },
+      { key: 'quantity', label: t('quantity') },
+      { key: 'totalQuantity', label: t('total') + ' ' + t('quantity') },
       { key: 'propertyId', label: t('properties') },
       { key: 'installDate', label: t('installDate') },
       { key: 'warrantyEnd', label: t('warrantyEnd') },
@@ -115,8 +115,8 @@ export default function InventoryPage() {
       { key: 'hp', label: t('hp') },
       { key: 'type', label: t('inventoryType') },
       { key: 'location', label: t('location') },
-      { key: 'quantity', label: 'Quantity' },
-      { key: 'totalQuantity', label: 'Total Quantity' },
+      { key: 'quantity', label: t('quantity') },
+      { key: 'totalQuantity', label: t('total') + ' ' + t('quantity') },
       { key: 'propertyId', label: t('properties') },
       { key: 'installDate', label: t('installDate') },
       { key: 'warrantyEnd', label: t('warrantyEnd') },
@@ -150,7 +150,7 @@ export default function InventoryPage() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-gray-800">{t('inventory')}</h1>
-          <p className="text-gray-600 mt-1">Manage all inventory items and equipment</p>
+          <p className="text-gray-600 mt-1">{t('trackMaintenanceRequests')}</p>
         </div>
       </div>
 
@@ -168,7 +168,7 @@ export default function InventoryPage() {
                 onChange={(e) => setFilterProperty(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Properties</option>
+                <option value="all">{t('all')} {t('properties')}</option>
                 {mockProperties.map((prop) => (
                   <option key={prop.id} value={prop.id}>
                     {prop.address}
@@ -186,7 +186,7 @@ export default function InventoryPage() {
                 onChange={(e) => setFilterType(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Types</option>
+                <option value="all">{t('all')} {t('inventoryType')}</option>
                 <option value="hvac">{t('type_hvac')}</option>
                 <option value="electrical">{t('type_electrical')}</option>
                 <option value="plumbing">{t('type_plumbing')}</option>
@@ -198,15 +198,15 @@ export default function InventoryPage() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2">
-                Warranty Status
+                {t('warrantyStatus')}
               </label>
               <select
                 value={filterWarranty}
                 onChange={(e) => setFilterWarranty(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Items</option>
-                <option value="active">Active Warranty</option>
+                <option value="all">{t('all')} {t('inventoryItem')}</option>
+                <option value="active">{t('active')} {t('warrantyStatus')}</option>
                 <option value="expiring">{t('warrantyExpiring')} (≤90 days)</option>
                 <option value="expired">{t('warrantyExpired')}</option>
               </select>
@@ -229,7 +229,7 @@ export default function InventoryPage() {
           </div>
 
           <p className="text-sm text-gray-600">
-            Showing {filtered.length} of {mockInventory.length} items
+            {t('showing')} {filtered.length} {t('of')} {mockInventory.length} {t('items')}
           </p>
         </div>
 
@@ -243,7 +243,7 @@ export default function InventoryPage() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('model')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('inventoryType')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('location')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Total Qty</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('total')} {t('quantity')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('installDate')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('warrantyEnd')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('status')}</th>
