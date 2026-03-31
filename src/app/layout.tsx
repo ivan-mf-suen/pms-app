@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PMS Pro - Property Management System",
+  title: "PMS Prototype - Property Management System",
   description: "Professional Property Management System with dashboard",
 };
 

@@ -37,9 +37,33 @@ export default function CreateWorkOrderPage() {
     // Fallback to mock data
     return mockMaintenanceRequests.find(r => r.id === maintenanceId);
   };
+  
+  const getAllWorkOrders = () => {
+    const savedWOs = localStorage.getItem('workOrders');
+    const localWOs = savedWOs ? JSON.parse(savedWOs) : [];
+        
+    // Merge and deduplicate: localStorage items are newer, so use them if they exist
+    const merged = [...mockWorkOrders];
+    const mergedIds = new Set(merged.map(wo => wo.id));
+        
+    localWOs.forEach((wo: any) => {
+    const index = merged.findIndex(m => m.id === wo.id);
+    if (index >= 0) {
+        // Update existing with localStorage version (newer)
+        merged[index] = wo;
+    } else {
+        // Add new work orders from localStorage
+        merged.push(wo);
+    }
+    });
+    
+    return merged;
+};
 
   const maintenanceRequest = getMaintenanceRequest();
+  const allWorkOrders = getAllWorkOrders();
   const property = maintenanceRequest ? mockProperties.find((p) => p.id === maintenanceRequest.propertyId) : null;
+  const workOrder = maintenanceRequest ? mockWorkOrders.find((wo) => wo.id === maintenanceRequest.workOrderId) : null;
 
   // Pre-fill form from maintenance data
   useEffect(() => {
@@ -75,9 +99,9 @@ export default function CreateWorkOrderPage() {
 
     try {
       // Generate work order
-      const controlNumber = `WO-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+      const controlNumber = `WO-2026-${(allWorkOrders.length + 1).toString().padStart(4, '0')}`;
       const newWorkOrder = {
-        id: `wo-${Date.now()}`,
+        id: `WO-2026-${(allWorkOrders.length + 1).toString().padStart(4, '0')}`,
         controlNumber,
         propertyId: maintenanceRequest.propertyId,
         maintenanceRequestId: maintenanceRequest.id,

@@ -26,12 +26,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-slate-800 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 py-4">
+    <nav className="sticky top-0 z-50 bg-slate-800 text-white shadow-lg">
+      <div className="max-w-[88rem] mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="font-bold text-xl">
-              🏠 PMS
+              🏠 PMS Prototype
             </Link>
             <div className="hidden md:flex gap-6">
               <Link

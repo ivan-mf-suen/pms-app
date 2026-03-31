@@ -71,6 +71,7 @@ export default function Home() {
               value={expiredWarrantyCount}
               subtext={t('expiredWarranties')}
               icon="⚠️"
+              borderColor="border-red-400"
             />
           </Link>
         </div>

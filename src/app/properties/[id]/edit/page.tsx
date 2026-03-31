@@ -265,7 +265,7 @@ export default function EditPropertyPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label htmlFor="purchasePrice" className="block text-gray-700 font-semibold mb-2">
-                {t('purchasePrice')} (USD)
+                {t('purchasePrice')} (HKD)
               </label>
               <input
                 type="number"
@@ -280,7 +280,7 @@ export default function EditPropertyPage() {
             </div>
             <div>
               <label htmlFor="currentValue" className="block text-gray-700 font-semibold mb-2">
-                {t('currentValue')} (USD)
+                {t('currentValue')} (HKD)
               </label>
               <input
                 type="number"

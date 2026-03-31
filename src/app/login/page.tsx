@@ -77,8 +77,8 @@ export default function LoginPage() {
               </svg>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900">PMS</h1>
-          <p className="text-slate-700 mt-2 text-sm">Property Management System</p>
+          <h1 className="text-3xl font-bold text-slate-900">PMS Prototype</h1>
+          {/* <p className="text-slate-700 mt-2 text-sm">Property Management System </p> */}
         </div>
 
         {/* Error Message */}

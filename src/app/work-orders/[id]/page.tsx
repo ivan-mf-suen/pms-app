@@ -2,28 +2,41 @@
 
 import { useI18n } from '@/contexts/I18nContext';
 import { mockWorkOrders, mockInventory, mockProperties } from '@/lib/mockData';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { notFound } from 'next/navigation';
 
-export default function WorkOrderDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function WorkOrderDetailPage() {
   const { t } = useI18n();
+  const params = useParams();
+  const { id } = params as { id: string };
   const [workOrderId, setWorkOrderId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
 
   // Extract ID from promise (client-side component)
-  if (!workOrderId && typeof window !== 'undefined') {
-    params.then((resolved) => setWorkOrderId(resolved.id));
-  }
+  // if (!workOrderId && typeof window !== 'undefined') {
+  //   params.then((resolved) => setWorkOrderId(resolved.id));
+  // }
 
-  const wo = mockWorkOrders.find((w) => w.id === workOrderId);
-  if (!wo) {
-    return null; // Will show not-found
-  }
-
+   // Helper to get work order request from localStorage or mock data
+  const getWorkOrderRequest = () => {
+    if (typeof window === 'undefined') {
+      return mockWorkOrders.find((r) => r.id === id) || notFound();
+    }
+    
+    // Check localStorage first
+    const saved = localStorage.getItem('workOrders');
+    const savedRequests = saved ? JSON.parse(saved) : [];
+    const foundSaved = savedRequests.find((r: any) => r.id === id);
+    
+    if (foundSaved) return foundSaved;
+    
+    // Fallback to mock data
+    return mockWorkOrders.find(r => r.id ===  id) || notFound();
+  };
+  
+  // Resolve params synchronously by finding the work order with the given ID
+  const wo = getWorkOrderRequest();
   const property = mockProperties.find((p) => p.id === wo.propertyId);
   const linkedInventory = mockInventory.filter((inv) => wo.inventoryIds.includes(inv.id));
 

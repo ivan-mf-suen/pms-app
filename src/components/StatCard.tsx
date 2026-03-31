@@ -5,11 +5,12 @@ interface StatCardProps {
   value: string | number;
   subtext?: string;
   icon?: React.ReactNode;
+  borderColor?: string | null;
 }
 
-export default function StatCard({ label, value, subtext, icon }: StatCardProps) {
+export default function StatCard({ label, value, subtext, icon, borderColor}: StatCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+    <div className={`bg-white rounded-lg shadow p-6 border-l-4 ${borderColor ? borderColor : 'border-blue-500'}`}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-gray-600 text-sm font-medium">{label}</p>
