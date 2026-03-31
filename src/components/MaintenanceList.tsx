@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/contexts/I18nContext';
 import { MaintenanceRequest } from '@/lib/mockData';
 
 interface MaintenanceListProps {
@@ -21,8 +22,10 @@ const statusColors: Record<string, string> = {
 };
 
 export default function MaintenanceList({ requests }: MaintenanceListProps) {
+  const { t } = useI18n();
+
   const getStatusLabel = (status: string) => {
-    return status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ');
+    return t(`maintenanceStatus_${status}`)
   };
 
   return (
@@ -41,7 +44,7 @@ export default function MaintenanceList({ requests }: MaintenanceListProps) {
                 <p className="text-sm text-gray-600 mt-1">{request.description}</p>
                 <div className="flex gap-2 mt-2 flex-wrap">
                   <span className={`text-xs px-2 py-1 rounded ${priorityColors[request.priority]}`}>
-                    {request.priority.charAt(0).toUpperCase() + request.priority.slice(1)}
+                    {t(`priority_${request.priority}`)}
                   </span>
                   <span className={`text-xs px-2 py-1 rounded ${statusColors[request.status]}`}>
                     {getStatusLabel(request.status)}
@@ -52,7 +55,7 @@ export default function MaintenanceList({ requests }: MaintenanceListProps) {
                 <p className="font-semibold text-gray-800">
                   ${request.estimatedCost.toLocaleString()}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">Est. cost</p>
+                <p className="text-xs text-gray-500 mt-1">{t('estimatedCost')}</p>
               </div>
             </div>
           </div>

@@ -114,6 +114,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     viewDetails: 'View Details',
     viewAllPropertyInventory: 'View All Property Inventory',
     viewInventory: 'View Inventory',
+    backToInventory: 'Back to Inventory',
 
     // Work Orders
     workOrder: 'Work Order',
@@ -397,6 +398,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     viewDetails: '查看詳情',
     viewAllPropertyInventory: '查看所有資產庫存',
     viewInventory: '查看庫存',
+    backToInventory: '返回庫存',
 
     // Work Orders
     workOrder: '工作單',

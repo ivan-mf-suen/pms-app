@@ -257,7 +257,7 @@ export default function InventoryDetailPage() {
                 href="/inventory"
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
               >
-                {t('backTo')} {t('inventory')}
+                {t('backToInventory')}
               </Link>
             </div>
           </div>
