@@ -205,14 +205,14 @@ export default function WorkOrdersPage() {
             <table className="w-full">
               <thead className="bg-gray-100 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Control #</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Property</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('controlNumber')}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('properties')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('workOrderStatus')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('priority')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Cumulative Cost</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Threshold</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Created</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Action</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('cumulative')}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('Threshold')}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('createdDate')}</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -265,11 +265,11 @@ export default function WorkOrdersPage() {
                         <td className="px-6 py-4 text-sm">
                           {exceedsThreshold ? (
                             <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold">
-                              EXCEEDS
+                              {t('exceedsThreshold')}
                             </span>
                           ) : (
                             <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold">
-                              OK
+                              {t('withinThreshold')}
                             </span>
                           )}
                         </td>
