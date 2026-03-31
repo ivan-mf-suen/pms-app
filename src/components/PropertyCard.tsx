@@ -1,7 +1,7 @@
 'use client';
 
 import { useI18n } from '@/contexts/I18nContext';
-import { Property } from '@/lib/mockData';
+import { mockInventory, mockMaintenanceRequests, mockWorkOrders, Property } from '@/lib/mockData';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -16,8 +16,31 @@ const statusColors: Record<string, string> = {
   vacant: 'bg-red-100 text-red-800',
 };
 
+// Helper function to check if warranty is expired
+const isWarrantyExpired = (warrantyEnd: string): boolean => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const warranty = new Date(warrantyEnd);
+  warranty.setHours(0, 0, 0, 0);
+  return warranty.getTime() < today.getTime();
+};
+
 export default function PropertyCard({ property }: PropertyCardProps) {
   const { t } = useI18n();
+
+  // Count expired warranty items
+  const expiredWarrantyCount = mockInventory.filter((item) => 
+    item.locations.some((loc) => isWarrantyExpired(loc.warrantyEnd) && loc.propertyId === property.id)
+  ).length;
+
+  const workOrderCount = mockWorkOrders.filter((item) => 
+    item.propertyId === property.id
+  ).length;
+
+  const maintenanceCount = mockMaintenanceRequests.filter((item) => 
+    item.propertyId === property.id
+  ).length;
+
   return (
     <Link href={`/properties/${property.id}`}>
       <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden cursor-pointer">
@@ -37,7 +60,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             </div>
           )}
           <div className={`absolute top-2 right-2 px-3 py-1 rounded-full text-xs font-semibold ${statusColors[property.status]}`}>
-            {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
+            {t(`propertyType_${property.type}`)}
           </div>
         </div>
         <div className="p-4">
@@ -46,13 +69,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             {property.city}, {property.state} {property.zipCode}
           </p>
           <div className="flex gap-4 mt-3 text-sm text-gray-600">
-            <span>🛏️ {property.bedrooms + property.bathrooms} bed</span>
+            <span>⚠️{expiredWarrantyCount} {t('expiredWarranties')}</span>
+            <span>📝{workOrderCount} {t('workOrders')}</span>
           </div>
           <div className="mt-3 pt-3 border-t">
-            <p className="text-sm font-semibold text-gray-800">
+            {/* <p className="text-sm font-semibold text-gray-800">
               ${property.currentValue.toLocaleString()}
-            </p>
-            <p className="text-xs text-gray-500 mt-1">{t('propertyType')}: {property.type}</p>
+            </p> */}
+            <p className="text-sm text-gray-500">🔧{maintenanceCount} {t('maintenanceIssues')}</p>
           </div>
         </div>
       </div>

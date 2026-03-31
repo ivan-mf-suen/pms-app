@@ -14,7 +14,7 @@ export interface Property {
   city: string;
   state: string;
   zipCode: string;
-  type: 'kindergarten' | 'secondaryschool';
+  type: 'kindergarten' | 'secondaryschool' | 'primarysecondaryschool' | 'internationalschool';
   bedrooms: number;
   bathrooms: number;
   squareFeet: number;
@@ -85,7 +85,7 @@ export interface Inventory {
   brand: string;
   model: string;
   hp?: number;
-  type: 'hvac' | 'electrical' | 'plumbing' | 'structural' | 'appliance' | 'other' | 'fire';
+  type: 'hvac' | 'electrical' | 'plumbing' | 'structural' | 'appliance' | 'fire' | 'other';
   locations: LocationInfo[];
 }
 
@@ -184,54 +184,54 @@ export const mockProperties: Property[] = [
     imageUrl: '/prop-002-image.jpg',
     floorPlanUrl: '/prop-002-floor-map.jpg',
   },
-  // {
-  //   id: 'prop-003',
-  //   address: '789 Pine Road',
-  //   city: 'Springfield',
-  //   state: 'IL',
-  //   zipCode: '62703',
-  //   type: 'apartment',
-  //   bedrooms: 1,
-  //   bathrooms: 1,
-  //   squareFeet: 650,
-  //   purchasePrice: 120000,
-  //   currentValue: 135000,
-  //   status: 'available',
-  //   imageUrl: 'prop-003-image.jpg',
-  //   floorPlanUrl: 'prop-003-floor-map.jpg',
-  // },
-  // {
-  //   id: 'prop-004',
-  //   address: '321 Elm Street',
-  //   city: 'Springfield',
-  //   state: 'IL',
-  //   zipCode: '62704',
-  //   type: 'duplex',
-  //   bedrooms: 4,
-  //   bathrooms: 2,
-  //   squareFeet: 1800,
-  //   purchasePrice: 350000,
-  //   currentValue: 385000,
-  //   status: 'occupied',
-  //   imageUrl: 'prop-004-image.jpg',
-  //   floorPlanUrl: 'prop-004-floor-map.jpg',
-  // },
-  // {
-  //   id: 'prop-005',
-  //   address: '654 Cedar Lane',
-  //   city: 'Springfield',
-  //   state: 'IL',
-  //   zipCode: '62705',
-  //   type: 'commercial',
-  //   bedrooms: 0,
-  //   bathrooms: 1,
-  //   squareFeet: 2000,
-  //   purchasePrice: 400000,
-  //   currentValue: 450000,
-  //   status: 'occupied',
-  //   imageUrl: 'prop-005-image.jpg',
-  //   floorPlanUrl: 'prop-005-floor-map.jpg',
-  // },
+  {
+    id: 'prop-003',
+    address: '保良局譚歐陽少芳紀念幼稚園',
+    city: '紅磡黃埔花園第七期地下3B鋪',
+    state: '九龍',
+    zipCode: '',
+    type: 'kindergarten',
+    bedrooms: 2,
+    bathrooms: 2,
+    squareFeet: 8500,
+    purchasePrice: 1800000,
+    currentValue: 2100000,
+    status: 'available',
+    imageUrl: '/prop-003-image.jpg',
+    floorPlanUrl: '/prop-003-floor-map.jpg',
+  },
+  {
+    id: 'prop-004',
+    address: '保良局蔡繼有學校',
+    city: '琵琶山郝德傑道6號',
+    state: '九龍',
+    zipCode: '',
+    type: 'primarysecondaryschool',
+    bedrooms: 0,
+    bathrooms: 10,
+    squareFeet: 120000,
+    purchasePrice: 4500000,
+    currentValue: 5200000,
+    status: 'available',
+    imageUrl: '/prop-004-image.jpg',
+    floorPlanUrl: '/prop-004-floor-map.jpg',
+  },
+  {
+    id: 'prop-005',
+    address: '保良局建造商會學校',
+    city: '天后廟道62號',
+    state: '香港島',
+    zipCode: '',
+    type: 'internationalschool',
+    bedrooms: 0,
+    bathrooms: 8,
+    squareFeet: 95000,
+    purchasePrice: 4000000,
+    currentValue: 4650000,
+    status: 'available',
+    imageUrl: '/prop-005-image.jpg',
+    floorPlanUrl: '/prop-005-floor-map.jpg',
+  }
 ];
 
 export const mockTenants: Tenant[] = [
@@ -406,6 +406,19 @@ export const mockInventory: Inventory[] = [
         x: 20,
         y: 80,
       },
+      {
+        id: 'loc-001-2',
+        address: '保良局譚歐陽少芳紀念幼稚園',
+        quantity: 1,
+        lastVerified: '2026-02-16',
+        condition: 'excellent',
+        propertyId: 'prop-003',
+        installDate: '2019-09-01',
+        warrantyEnd: '2025-09-01',
+        status: 'active',
+        x: 48,
+        y: 50,
+      }
     ],
   },
   {
@@ -441,6 +454,19 @@ export const mockInventory: Inventory[] = [
         x: 70,
         y: 65,
       },
+      {
+        id: 'loc-002-3',
+        address: '保良局蔡繼有學校',
+        quantity: 1,
+        lastVerified: '2026-02-16',
+        condition: 'fair',
+        propertyId: 'prop-004',
+        installDate: '2020-06-15',
+        warrantyEnd: '2025-06-15',
+        status: 'active',
+        x: 72,
+        y: 22,
+      }
     ],
   },
   {
@@ -541,6 +567,19 @@ export const mockInventory: Inventory[] = [
         x: 28,
         y: 78,
       },
+      {
+        id: 'loc-006-2',
+        address: '保良局建造商會學校',
+        quantity: 2,
+        lastVerified: '2026-02-18',
+        condition: 'fair',
+        propertyId: 'prop-005',
+        installDate: '2023-03-18',
+        warrantyEnd: '2028-03-18',
+        status: 'active',
+        x: 30,
+        y: 55,
+      }
     ],
   },
   {
@@ -1009,21 +1048,21 @@ export const mockUsers: User[] = [
     id: 'user-001',
     email: 'ivan.mf.suen@poleungkuk.org.hk',
     password: 'admin123',
-    name: 'Admin User',
+    name: 'Ivan Suen',
     role: 'admin',
   },
   {
     id: 'user-002',
     email: 'manager@poleungkuk.org.hk',
     password: 'manager123',
-    name: 'Property Manager',
+    name: 'Emma Lam',
     role: 'manager',
   },
   {
     id: 'user-003',
     email: 'demo@poleungkuk.org.hk',
     password: 'demo123',
-    name: 'Demo User',
+    name: 'Coby Tsang',
     role: 'user',
   },
 ];

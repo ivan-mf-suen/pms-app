@@ -56,7 +56,7 @@ export default function Home() {
           <StatCard
             label={t('totalProperties')}
             value={totalProperties}
-            subtext={`${occupiedProperties} ${t('occupied')}`}
+            subtext={`${occupiedProperties} ${t('rentalAgreementExpired')}`}
             icon="🏢"
           />
            <StatCard

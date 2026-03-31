@@ -237,11 +237,11 @@ export default function PropertyDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-gray-600 text-sm">{t('propertyType')}</p>
-                  <p className="font-semibold text-gray-800 capitalize">{property.type}</p>
+                  <p className="font-semibold text-gray-800 capitalize">{t(`propertyType_${property.type}`)}</p>
                 </div>
                 <div>
                   <p className="text-gray-600 text-sm">{t('status')}</p>
-                  <p className="font-semibold text-gray-800 capitalize">{property.status}</p>
+                  <p className="font-semibold text-gray-800 capitalize">{t(`propertyStatus_${property.status}`)}</p>
                 </div>
                 <div>
                   <p className="text-gray-600 text-sm">{t('maintenanceRequests')}</p>

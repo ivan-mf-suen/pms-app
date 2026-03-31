@@ -126,7 +126,7 @@ export default function Navbar() {
 
             {/* User Info */}
             <div className="text-sm">
-              <p className="text-gray-300">{user?.email}</p>
+              <p className="text-gray-300">{user?.name}</p>
               <p className="text-gray-400 text-xs">{user?.role}</p>
             </div>
 

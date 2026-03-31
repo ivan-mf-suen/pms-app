@@ -56,6 +56,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     showing: 'Showing',
     actionRequired: 'Action required',
     id: 'ID',
+    rentalAgreementExpired: 'rental agreement to be expired within 3 months',
 
     // Properties
     allProperties: 'All Properties',
@@ -78,6 +79,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     propertyType_house: 'House',
     propertyType_commercial: 'Commercial',
     propertyType_duplex: 'Duplex',
+    propertyType_kindergarten: 'Kindergarten',
+    propertyType_secondaryschool: 'Secondary School',
+    propertyType_primarysecondaryschool: 'Primary & Secondary School',
+    propertyType_internationalschool: 'International Primary School',
     manageAllProperties: 'Manage all your properties in one place',
     noPropertiesFound: 'No properties found',
     backToProperties: 'Back to Properties',
@@ -277,8 +282,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     activeTenants: 'Active Tenants',
     currentlyLeasing: 'Currently leasing',
     maintenanceIssues: 'Maintenance Issues',
-    expiredWarrantyItems: 'Expired Warranty Items',
-    expiredWarranties: 'Items with expired warranties',
+    expiredWarrantyItems: 'Expired / To be Expired Items (within 3 months)',
+    expiredWarranties: 'items expired',
 
     // Messages
     confirmDelete: 'Are you sure you want to delete this item?',
@@ -338,6 +343,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     showing: '顯示',
     actionRequired: '需要操作',
     id: '編號',
+    rentalAgreementExpired: '租約將在3個月內到期',
 
     // Properties
     allProperties: '所有資產',
@@ -362,6 +368,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     propertyType_duplex: '透天',
     propertyType_secondaryschool: '中學',
     propertyType_kindergarten: '幼稚園',
+    propertyType_primarysecondaryschool: '小學 & 中學',
+    propertyType_internationalschool: '國際小學學校',
     manageAllProperties: '一站式管理您的所有資產',
     noPropertiesFound: '找不到資產',
     backToProperties: '返回資產',
@@ -561,8 +569,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     activeTenants: '活躍租戶',
     currentlyLeasing: '正在出租',
     maintenanceIssues: '維護請求',
-    expiredWarrantyItems: '已過期保修項目',
-    expiredWarranties: '保修期已過期的項目',
+    expiredWarrantyItems: '已過期/即將過期保修項目',
+    expiredWarranties: '已過期項目',
 
     // Messages
     confirmDelete: '您確定要刪除此項目嗎？',
