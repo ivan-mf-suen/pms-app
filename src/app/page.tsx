@@ -6,7 +6,6 @@ import PropertyCard from '@/components/PropertyCard';
 import MaintenanceList from '@/components/MaintenanceList';
 import RecentPayments from '@/components/RecentPayments';
 import DashboardCalendar from '@/components/DashboardCalendar';
-import CalendarEventDetails from '@/components/CalendarEventDetails';
 import { useI18n } from '@/contexts/I18nContext';
 import {
   mockProperties,
@@ -16,13 +15,11 @@ import {
   mockInventory,
   mockWorkOrders,
 } from '@/lib/mockData';
-import { mergeCalendarEvents, DayEvents } from '@/lib/calendarUtils';
+import { mergeCalendarEvents } from '@/lib/calendarUtils';
 import Link from 'next/link';
 
 export default function Home() {
   const { t } = useI18n();
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedDayEvents, setSelectedDayEvents] = useState<DayEvents | null>(null);
   const [calendarEvents, setCalendarEvents] = useState<Record<string, any>>({});
 
   // Load work orders from localStorage and merge with mockData for calendar
@@ -121,20 +118,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Calendar */}
-            <DashboardCalendar
-              events={calendarEvents}
-              onDateClick={(date, dayEvents) => {
-                setSelectedDate(date);
-                setSelectedDayEvents(dayEvents);
-              }}
-            />
-
-            {/* Maintenance Requests Row */}
+             {/* Maintenance Requests Row */}
               <div className="bg-white rounded-lg shadow p-6 mb-8">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold text-gray-800">{t('recentMaintenanceRequests')}</h2>
@@ -145,19 +129,13 @@ export default function Home() {
                 <MaintenanceList requests={mockMaintenanceRequests} />
               </div>
           </div>
-        </div>
 
-      {/* Calendar Event Details Modal */}
-      {selectedDate && selectedDayEvents && (
-        <CalendarEventDetails
-          date={selectedDate}
-          dayEvents={selectedDayEvents}
-          onClose={() => {
-            setSelectedDate(null);
-            setSelectedDayEvents(null);
-          }}
-        />
-      )}
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Calendar */}
+            <DashboardCalendar events={calendarEvents} />
+          </div>
+        </div>
       </div>
     </div>
   );
