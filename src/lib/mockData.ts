@@ -87,6 +87,7 @@ export interface LocationInfo {
   status: 'active' | 'inactive' | 'retired';
   x?: number; // position on floor map, 0-100 (percentage from left)
   y?: number; // position on floor map, 0-100 (percentage from top)
+  floorPlanName?: string; // which floor plan (e.g., "Ground Floor", "1st Floor") - references Property.floorPlans[].label
 }
 
 export interface Inventory {
@@ -475,6 +476,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 20,
         y: 80,
+        floorPlanName: 'Ground Floor',
       },
       {
         id: 'loc-001-2',
@@ -488,6 +490,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 48,
         y: 50,
+        floorPlanName: 'Ground Floor',
       }
     ],
   },
@@ -510,6 +513,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 75,
         y: 70,
+        floorPlanName: 'Ground Floor',
       },
       {
         id: 'loc-002-2',
@@ -523,6 +527,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 70,
         y: 65,
+        floorPlanName: 'Ground Floor',
       },
       {
         id: 'loc-002-3',
@@ -536,6 +541,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 72,
         y: 22,
+        floorPlanName: 'Ground Floor',
       }
     ],
   },
@@ -558,6 +564,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 40,
         y: 20,
+        floorPlanName: 'Ground Floor',
       },
     ],
   },
@@ -580,6 +587,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 35,
         y: 82,
+        floorPlanName: '1st Floor',
       },
     ],
   },
@@ -601,6 +609,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 60,
         y: 55,
+        floorPlanName: 'Ground Floor',
       },
       {
         id: 'loc-005-2',
@@ -614,6 +623,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 88,
         y: 48,
+        floorPlanName: '1st Floor',
       },
     ],
   },
@@ -636,6 +646,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 28,
         y: 78,
+        floorPlanName: 'Ground Floor',
       },
       {
         id: 'loc-006-2',
@@ -649,6 +660,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 30,
         y: 55,
+        floorPlanName: 'Ground Floor',
       }
     ],
   },
@@ -670,6 +682,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 25,
         y: 38,
+        floorPlanName: '2nd Floor',
       },
     ],
   },
@@ -692,6 +705,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 30,
         y: 48,
+        floorPlanName: 'Ground Floor',
       },
     ],
   },
@@ -714,6 +728,7 @@ export const mockInventory: Inventory[] = [
         status: 'active',
         x: 78,
         y: 72,
+        floorPlanName: 'Ground Floor',
       },
     ],
   }

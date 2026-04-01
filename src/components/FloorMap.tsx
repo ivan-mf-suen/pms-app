@@ -9,6 +9,7 @@ interface FloorMapProps {
   propertyId: string;
   floorPlanUrl?: string;
   inventory: Inventory[];
+  currentFloorLabel?: string;
 }
 
 const typeIcons: Record<string, string> = {
@@ -29,15 +30,18 @@ const typeColors: Record<string, string> = {
   other: 'bg-gray-100 text-gray-700',
 };
 
-export default function FloorMap({ propertyId, floorPlanUrl, inventory }: FloorMapProps) {
+export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentFloorLabel }: FloorMapProps) {
   const router = useRouter();
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
 
-  // Filter inventory items that are located in this property
+  // Filter inventory items that are located in this property and on current floor
   const propertyInventory = inventory
     .map((inv) => ({
       ...inv,
-      locations: inv.locations.filter((loc) => loc.propertyId === propertyId),
+      locations: inv.locations.filter((loc) => 
+        loc.propertyId === propertyId && 
+        (!currentFloorLabel || !loc.floorPlanName || loc.floorPlanName === currentFloorLabel)
+      ),
     }))
     .filter((inv) => inv.locations.length > 0);
 

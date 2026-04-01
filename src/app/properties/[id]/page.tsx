@@ -10,7 +10,7 @@ import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
 
-export default function PropertyDetailPage() { 
+export default function PropertyDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { t } = useI18n();
@@ -141,7 +141,7 @@ export default function PropertyDetailPage() {
               </div>
             </div>
 
-            
+
 
             {/* Floor Map Section */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -153,11 +153,10 @@ export default function PropertyDetailPage() {
                       <button
                         key={index}
                         onClick={() => setSelectedFloorIndex(index)}
-                        className={`px-4 py-2 rounded transition font-semibold text-sm ${
-                          selectedFloorIndex === index
+                        className={`px-4 py-2 rounded transition font-semibold text-sm ${selectedFloorIndex === index
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                        }`}
+                          }`}
                       >
                         {floor.label}
                       </button>
@@ -169,9 +168,10 @@ export default function PropertyDetailPage() {
                 propertyId={property.id}
                 floorPlanUrl={property.floorPlans?.[selectedFloorIndex]?.url || property.floorPlanUrl}
                 inventory={mockInventory}
+                currentFloorLabel={property.floorPlans?.[selectedFloorIndex]?.label}
               />
             </div>
-              {/* Product Inventory Details */}
+            {/* Product Inventory Details */}
             {propertyInventory.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6">
                 <div className="flex justify-between items-center mb-4">
@@ -218,13 +218,12 @@ export default function PropertyDetailPage() {
                           <div>
                             <p className="text-gray-600 text-sm font-semibold">{t('status')}</p>
                             <span
-                              className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
-                                firstLocation?.status === 'active'
+                              className={`inline-block px-3 py-1 rounded text-xs font-semibold ${firstLocation?.status === 'active'
                                   ? 'bg-green-100 text-green-800'
                                   : firstLocation?.status === 'inactive'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-gray-100 text-gray-800'
-                              }`}
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-gray-100 text-gray-800'
+                                }`}
                             >
                               {firstLocation?.status}
                             </span>
@@ -278,11 +277,11 @@ export default function PropertyDetailPage() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            
+
             {/* Property Details */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">{t('propertyDetails')}</h2>
-              <div className="space-y-4">
+              <div className="space-y-5 grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div>
                   <p className="text-gray-600 text-xs font-semibold uppercase">{t('propertyType')}</p>
                   <p className="font-semibold text-gray-800 capitalize">{t(`propertyType_${property.type}`)}</p>
@@ -292,67 +291,65 @@ export default function PropertyDetailPage() {
                   <p className="font-semibold text-gray-800 capitalize">{t(`propertyStatus_${property.status}`)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-xs font-semibold uppercase">Year Established</p>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">{t('yearEstablished')}</p>
                   <p className="font-semibold text-gray-800">{property.yearEstablished}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-xs font-semibold uppercase">Year Built</p>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">{t('yearBuilt')}</p>
                   <p className="font-semibold text-gray-800">{property.yearBuiltConstructed}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-xs font-semibold uppercase">Total Area</p>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">{t('totalArea')}</p>
                   <p className="font-semibold text-gray-800">{property.squareFeet.toLocaleString()} sq ft</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-xs font-semibold uppercase">Ownership Status</p>
-                  <div className="mt-1">
-                    <span
-                      className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
-                        property.ownershipStatus === 'owned'
-                          ? 'bg-green-100 text-green-800'
-                          : property.ownershipStatus === 'leased'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {property.ownershipStatus.charAt(0).toUpperCase() + property.ownershipStatus.slice(1)}
-                    </span>
-                  </div>
-                </div>
-                <div className="border-t pt-4 mt-4">
-                  <p className="text-gray-600 text-xs font-semibold uppercase mb-3">Facility Manager</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600">👤</span>
-                      <p className="font-semibold text-gray-800">{property.facilityManager.name}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600">📞</span>
-                      <a
-                        href={`tel:${property.facilityManager.phone}`}
-                        className="text-blue-600 hover:underline font-semibold"
-                      >
-                        {property.facilityManager.phone}
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600">✉️</span>
-                      <a
-                        href={`mailto:${property.facilityManager.email}`}
-                        className="text-blue-600 hover:underline font-semibold break-all"
-                      >
-                        {property.facilityManager.email}
-                      </a>
-                    </div>
-                  </div>
                 </div>
                 <div>
                   <p className="text-gray-600 text-xs font-semibold uppercase">{t('maintenanceRequests')}</p>
                   <p className="font-semibold text-gray-800">{maintenanceRequests.length}</p>
                 </div>
+                <div>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">{t('ownershipStatus')}</p>
+                  <div className="mt-1">
+                    <span
+                      className={`inline-block px-3 py-1 rounded text-xs font-semibold ${property.ownershipStatus === 'owned'
+                          ? 'bg-green-100 text-green-800'
+                          : property.ownershipStatus === 'leased'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}
+                    >
+                      {t(`ownershipStatus_${property.ownershipStatus}`) || property.ownershipStatus}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t pt-4 mt-4">
+                <p className="text-gray-600 text-xs font-semibold uppercase mb-3">{t('facilityManager')}</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">👤</span>
+                    <p className="font-semibold text-gray-800">{property.facilityManager.name}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">📞</span>
+                    <a
+                      href={`tel:${property.facilityManager.phone}`}
+                      className="text-blue-600 hover:underline font-semibold"
+                    >
+                      {property.facilityManager.phone}
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">✉️</span>
+                    <a
+                      href={`mailto:${property.facilityManager.email}`}
+                      className="text-blue-600 hover:underline font-semibold break-all"
+                    >
+                      {property.facilityManager.email}
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
-
             {/* Maintenance History */}
             {maintenanceRequests.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6 mt-6">
@@ -370,28 +367,26 @@ export default function PropertyDetailPage() {
                       <p className="text-gray-600 text-sm mt-1">{request.description}</p>
                       <div className="flex gap-2 mt-2">
                         <span
-                          className={`text-xs px-2 py-1 rounded ${
-                            request.priority === 'urgent'
+                          className={`text-xs px-2 py-1 rounded ${request.priority === 'urgent'
                               ? 'bg-red-100 text-red-800'
                               : request.priority === 'high'
-                              ? 'bg-orange-100 text-orange-800'
-                              : request.priority === 'medium'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
+                                ? 'bg-orange-100 text-orange-800'
+                                : request.priority === 'medium'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                            }`}
                         >
                           {request.priority}
                         </span>
                         <span
-                          className={`text-xs px-2 py-1 rounded ${
-                            request.status === 'completed'
+                          className={`text-xs px-2 py-1 rounded ${request.status === 'completed'
                               ? 'bg-green-100 text-green-800'
                               : request.status === 'in_progress'
-                              ? 'bg-blue-100 text-blue-800'
-                              : request.status === 'open'
-                              ? 'bg-gray-100 text-gray-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
+                                ? 'bg-blue-100 text-blue-800'
+                                : request.status === 'open'
+                                  ? 'bg-gray-100 text-gray-800'
+                                  : 'bg-gray-100 text-gray-800'
+                            }`}
                         >
                           {request.status}
                         </span>

@@ -1,6 +1,7 @@
 'use client';
 
 import PropertyCard from '@/components/PropertyCard';
+import PropertyRow from '@/components/PropertyRow';
 import { mockProperties } from '@/lib/mockData';
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
@@ -12,10 +13,16 @@ export default function PropertiesPage() {
   const { user } = useAuth();
   const [filter, setFilter] = useState<string>('all');
   const [allProperties, setAllProperties] = useState(mockProperties);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Load properties from localStorage on mount
+  // Load view mode and properties from localStorage on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      const savedViewMode = localStorage.getItem('propertyViewMode') as 'grid' | 'list' | null;
+      if (savedViewMode) {
+        setViewMode(savedViewMode);
+      }
+
       const saved = localStorage.getItem('properties');
       const savedProperties = saved ? JSON.parse(saved) : [];
       
@@ -30,6 +37,13 @@ export default function PropertiesPage() {
       setAllProperties(combinedProperties);
     }
   }, []);
+
+  // Save view mode to localStorage when it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('propertyViewMode', viewMode);
+    }
+  }, [viewMode]);
 
   const filtered = filter === 'all' 
     ? allProperties 
@@ -62,56 +76,107 @@ export default function PropertiesPage() {
 
         {/* Filter */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded transition ${
-                filter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              {t('allProperties')} ({allProperties.length})
-            </button>
-            <button
-              onClick={() => setFilter('occupied')}
-              className={`px-4 py-2 rounded transition ${
-                filter === 'occupied'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              {t('propertyStatus_occupied')} ({allProperties.filter((p) => p.status === 'occupied').length})
-            </button>
-            <button
-              onClick={() => setFilter('available')}
-              className={`px-4 py-2 rounded transition ${
-                filter === 'available'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              {t('propertyStatus_available')} ({mockProperties.filter((p) => p.status === 'available').length})
-            </button>
-            <button
-              onClick={() => setFilter('maintenance')}
-              className={`px-4 py-2 rounded transition ${
-                filter === 'maintenance'
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              {t('propertyStatus_maintenance')} ({mockProperties.filter((p) => p.status === 'maintenance').length})
-            </button>
+          <div className="flex gap-2 flex-wrap justify-between items-center">
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-4 py-2 rounded transition ${
+                  filter === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {t('allProperties')} ({allProperties.length})
+              </button>
+              <button
+                onClick={() => setFilter('occupied')}
+                className={`px-4 py-2 rounded transition ${
+                  filter === 'occupied'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {t('propertyStatus_occupied')} ({allProperties.filter((p) => p.status === 'occupied').length})
+              </button>
+              <button
+                onClick={() => setFilter('available')}
+                className={`px-4 py-2 rounded transition ${
+                  filter === 'available'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {t('propertyStatus_available')} ({mockProperties.filter((p) => p.status === 'available').length})
+              </button>
+              <button
+                onClick={() => setFilter('maintenance')}
+                className={`px-4 py-2 rounded transition ${
+                  filter === 'maintenance'
+                    ? 'bg-yellow-600 text-white'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {t('propertyStatus_maintenance')} ({mockProperties.filter((p) => p.status === 'maintenance').length})
+              </button>
+            </div>
+
+            {/* View Mode Toggle */}
+            <div className="flex gap-2 border border-gray-300 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1 rounded transition text-sm font-semibold ${
+                  viewMode === 'grid'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+                title="Grid view"
+              >
+                ⊞ {t('grid') || 'Grid'}
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-1 rounded transition text-sm font-semibold ${
+                  viewMode === 'list'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+                title="List view"
+              >
+                ☰ {t('list') || 'List'}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Properties Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
-        </div>
+        {/* Properties Grid or List */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filtered.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-100 border-b">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('address')}</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('location')}</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('status')}</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('expiredWarranties') || 'Warranty Expiring'}</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('workOrders')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {filtered.map((property) => (
+                    <PropertyRow key={property.id} property={property} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {filtered.length === 0 && (
           <div className="text-center py-12">
