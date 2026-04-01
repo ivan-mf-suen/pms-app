@@ -22,7 +22,16 @@ export interface Property {
   currentValue: number;
   status: 'available' | 'occupied' | 'maintenance' | 'vacant';
   imageUrl?: string;
-  floorPlanUrl?: string; // floor map image for property detail
+  floorPlanUrl?: string; // [DEPRECATED] Use floorPlans array instead
+  yearEstablished: number; // Year facility was established
+  yearBuiltConstructed: number; // Year building was constructed
+  ownershipStatus: 'owned' | 'leased' | 'rented'; // Ownership classification
+  floorPlans: Array<{ url: string; label: string }>; // Multiple floor plan maps with descriptive labels
+  facilityManager: {
+    name: string;
+    phone: string;
+    email: string;
+  }; // Responsible person contact information
 }
 
 export interface Tenant {
@@ -167,6 +176,18 @@ export const mockProperties: Property[] = [
     status: 'available',
     imageUrl: '/prop-001-image.jpg',
     floorPlanUrl: '/prop-001-floor-map.jpg',
+    yearEstablished: 2008,
+    yearBuiltConstructed: 2005,
+    ownershipStatus: 'owned',
+    floorPlans: [
+      { url: '/prop-001-floor-map.jpg', label: 'Ground Floor' },
+      { url: '/prop-001-1st-floor-map.jpg', label: '1st Floor' },
+    ],
+    facilityManager: {
+      name: 'Wong Mei-ling',
+      phone: '+852 2234 5678',
+      email: 'meiling.wong@poleungkuk.org.hk',
+    },
   },
   {
     id: 'prop-002',
@@ -183,6 +204,19 @@ export const mockProperties: Property[] = [
     status: 'available',
     imageUrl: '/prop-002-image.jpg',
     floorPlanUrl: '/prop-002-floor-map.jpg',
+    yearEstablished: 1998,
+    yearBuiltConstructed: 1995,
+    ownershipStatus: 'leased',
+    floorPlans: [
+      { url: '/prop-002-floor-map.jpg', label: 'Ground Floor' },
+      { url: '/prop-002-1st-floor-map.jpg', label: '1st Floor' },
+      { url: '/prop-002-2nd-floor-map.jpg', label: '2nd Floor' },
+    ],
+    facilityManager: {
+      name: 'Lau Chung-man',
+      phone: '+852 2567 8901',
+      email: 'chungman.lau@poleungkuk.org.hk',
+    },
   },
   {
     id: 'prop-003',
@@ -199,6 +233,17 @@ export const mockProperties: Property[] = [
     status: 'available',
     imageUrl: '/prop-003-image.jpg',
     floorPlanUrl: '/prop-003-floor-map.jpg',
+    yearEstablished: 2010,
+    yearBuiltConstructed: 2009,
+    ownershipStatus: 'rented',
+    floorPlans: [
+      { url: '/prop-003-floor-map.jpg', label: 'Ground Floor' },
+    ],
+    facilityManager: {
+      name: 'Chan Siu-yuk',
+      phone: '+852 2345 6789',
+      email: 'siuyuk.chan@poleungkuk.org.hk',
+    },
   },
   {
     id: 'prop-004',
@@ -215,6 +260,19 @@ export const mockProperties: Property[] = [
     status: 'available',
     imageUrl: '/prop-004-image.jpg',
     floorPlanUrl: '/prop-004-floor-map.jpg',
+    yearEstablished: 2003,
+    yearBuiltConstructed: 2000,
+    ownershipStatus: 'owned',
+    floorPlans: [
+      { url: '/prop-004-floor-map.jpg', label: 'Ground Floor' },
+      { url: '/prop-004-1st-floor-map.jpg', label: '1st Floor' },
+      { url: '/prop-004-2nd-floor-map.jpg', label: '2nd Floor' },
+    ],
+    facilityManager: {
+      name: 'Ng Ho-yee',
+      phone: '+852 2789 0123',
+      email: 'hoyee.ng@poleungkuk.org.hk',
+    },
   },
   {
     id: 'prop-005',
@@ -231,6 +289,18 @@ export const mockProperties: Property[] = [
     status: 'available',
     imageUrl: '/prop-005-image.jpg',
     floorPlanUrl: '/prop-005-floor-map.jpg',
+    yearEstablished: 2015,
+    yearBuiltConstructed: 2014,
+    ownershipStatus: 'leased',
+    floorPlans: [
+      { url: '/prop-005-floor-map.jpg', label: 'Ground Floor' },
+      { url: '/prop-005-1st-floor-map.jpg', label: '1st Floor' },
+    ],
+    facilityManager: {
+      name: 'Tse Wai-mun',
+      phone: '+852 2456 7890',
+      email: 'waimun.tse@poleungkuk.org.hk',
+    },
   }
 ];
 

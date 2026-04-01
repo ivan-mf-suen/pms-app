@@ -18,6 +18,7 @@ export default function PropertyDetailPage() {
   const id = params.id as string;
   const [property, setProperty] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedFloorIndex, setSelectedFloorIndex] = useState(0);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -83,10 +84,35 @@ export default function PropertyDetailPage() {
           <a href="/properties" className="text-blue-600 hover:underline mb-4 block">
             ← {t('backToProperties')}
           </a>
-          <h1 className="text-3xl font-bold text-gray-800">{property.address}</h1>
-          <p className="text-gray-600 mt-1">
-            {property.city}, {property.state} {property.zipCode}
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">{property.address}</h1>
+              <p className="text-gray-600 mt-1">
+                {property.city}, {property.state} {property.zipCode}
+              </p>
+            </div>
+            {(user?.role === 'admin' || user?.role === 'manager') && (
+              <Link
+                href={`/properties/${property.id}/edit`}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                title="Edit property"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
@@ -118,11 +144,33 @@ export default function PropertyDetailPage() {
             
 
             {/* Floor Map Section */}
-            <FloorMap
-              propertyId={property.id}
-              floorPlanUrl={property.floorPlanUrl}
-              inventory={mockInventory}
-            />
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              {/* Floor Plan Tabs */}
+              {property.floorPlans && property.floorPlans.length > 1 && (
+                <div className="border-b bg-gray-50 p-4">
+                  <div className="flex gap-2 flex-wrap">
+                    {property.floorPlans.map((floor: any, index: number) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedFloorIndex(index)}
+                        className={`px-4 py-2 rounded transition font-semibold text-sm ${
+                          selectedFloorIndex === index
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        }`}
+                      >
+                        {floor.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <FloorMap
+                propertyId={property.id}
+                floorPlanUrl={property.floorPlans?.[selectedFloorIndex]?.url || property.floorPlanUrl}
+                inventory={mockInventory}
+              />
+            </div>
               {/* Product Inventory Details */}
             {propertyInventory.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6">
@@ -234,29 +282,74 @@ export default function PropertyDetailPage() {
             {/* Property Details */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">{t('propertyDetails')}</h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-gray-600 text-sm">{t('propertyType')}</p>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">{t('propertyType')}</p>
                   <p className="font-semibold text-gray-800 capitalize">{t(`propertyType_${property.type}`)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">{t('status')}</p>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">{t('status')}</p>
                   <p className="font-semibold text-gray-800 capitalize">{t(`propertyStatus_${property.status}`)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">{t('maintenanceRequests')}</p>
-                  <p className="font-semibold text-gray-800">{maintenanceRequests.length}</p>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">Year Established</p>
+                  <p className="font-semibold text-gray-800">{property.yearEstablished}</p>
                 </div>
                 <div>
-                  <p className="text-gray-600 text-sm">{t('squareFeet')}</p>
-                  <p className="font-semibold text-gray-800">{property.squareFeet.toLocaleString()}</p>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">Year Built</p>
+                  <p className="font-semibold text-gray-800">{property.yearBuiltConstructed}</p>
                 </div>
-                {/* <div>
-                  <p className="text-gray-600 text-sm">{t('currentValue')}</p>
-                  <p className="font-semibold text-gray-800">
-                    ${property.currentValue.toLocaleString()}
-                  </p>
-                </div> */}
+                <div>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">Total Area</p>
+                  <p className="font-semibold text-gray-800">{property.squareFeet.toLocaleString()} sq ft</p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">Ownership Status</p>
+                  <div className="mt-1">
+                    <span
+                      className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
+                        property.ownershipStatus === 'owned'
+                          ? 'bg-green-100 text-green-800'
+                          : property.ownershipStatus === 'leased'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}
+                    >
+                      {property.ownershipStatus.charAt(0).toUpperCase() + property.ownershipStatus.slice(1)}
+                    </span>
+                  </div>
+                </div>
+                <div className="border-t pt-4 mt-4">
+                  <p className="text-gray-600 text-xs font-semibold uppercase mb-3">Facility Manager</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">👤</span>
+                      <p className="font-semibold text-gray-800">{property.facilityManager.name}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">📞</span>
+                      <a
+                        href={`tel:${property.facilityManager.phone}`}
+                        className="text-blue-600 hover:underline font-semibold"
+                      >
+                        {property.facilityManager.phone}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">✉️</span>
+                      <a
+                        href={`mailto:${property.facilityManager.email}`}
+                        className="text-blue-600 hover:underline font-semibold break-all"
+                      >
+                        {property.facilityManager.email}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-xs font-semibold uppercase">{t('maintenanceRequests')}</p>
+                  <p className="font-semibold text-gray-800">{maintenanceRequests.length}</p>
+                </div>
               </div>
             </div>
 
@@ -312,27 +405,7 @@ export default function PropertyDetailPage() {
               </div>
             )}
 
-            {/* Actions - Admin/Manager Only */}
-            {(user?.role === 'admin' || user?.role === 'manager') && (
-            <div className="bg-white rounded-lg shadow p-6 mt-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4">{t('actions')}</h2>
-              <div className="flex gap-3 flex-wrap">
-                <Link
-                  href={`/properties/${property.id}/edit`}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold text-sm"
-                >
-                  {t('edit')}
-                </Link>
-                
-                <Link
-                  href="/properties"
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition text-sm"
-                >
-                  {t('back')}
-                </Link>
-              </div>
-            </div>
-            )}
+
           </div>
         </div>
       </div>

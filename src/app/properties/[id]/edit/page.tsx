@@ -49,6 +49,43 @@ export default function EditPropertyPage() {
     });
   };
 
+  const handleFacilityManagerChange = (field: string, value: string) => {
+    setFormData({
+      ...formData,
+      facilityManager: {
+        ...formData.facilityManager,
+        [field]: value,
+      },
+    });
+  };
+
+  const addFloorPlan = () => {
+    setFormData({
+      ...formData,
+      floorPlans: [
+        ...formData.floorPlans,
+        { url: '', label: '' },
+      ],
+    });
+  };
+
+  const removeFloorPlan = (index: number) => {
+    const updated = formData.floorPlans.filter((_, i: number) => i !== index);
+    setFormData({
+      ...formData,
+      floorPlans: updated,
+    });
+  };
+
+  const updateFloorPlan = (index: number, field: string, value: string) => {
+    const updated = [...formData.floorPlans];
+    updated[index] = { ...updated[index], [field]: value };
+    setFormData({
+      ...formData,
+      floorPlans: updated,
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -59,6 +96,36 @@ export default function EditPropertyPage() {
     }
     if (!formData.city.trim()) {
       setError('City is required');
+      return;
+    }
+    if (!formData.facilityManager.name.trim()) {
+      setError('Facility Manager name is required');
+      return;
+    }
+    if (!formData.facilityManager.phone.trim()) {
+      setError('Facility Manager phone is required');
+      return;
+    }
+    if (!formData.facilityManager.email.trim()) {
+      setError('Facility Manager email is required');
+      return;
+    }
+    if (formData.floorPlans.length === 0) {
+      setError('At least one floor plan is required');
+      return;
+    }
+    for (const floor of formData.floorPlans) {
+      if (!floor.label.trim() || !floor.url.trim()) {
+        setError('All floor plans must have a label and URL');
+        return;
+      }
+    }
+    if (formData.yearEstablished < 1900 || formData.yearEstablished > 2100) {
+      setError('Year Established must be between 1900 and 2100');
+      return;
+    }
+    if (formData.yearBuiltConstructed < 1900 || formData.yearBuiltConstructed > 2100) {
+      setError('Year Built must be between 1900 and 2100');
       return;
     }
 
@@ -293,6 +360,172 @@ export default function EditPropertyPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
               />
             </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t-2 border-gray-200 pt-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Facility Information</h2>
+          </div>
+
+          {/* Year Established & Year Built */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="yearEstablished" className="block text-gray-700 font-semibold mb-2">
+                Year Established <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="yearEstablished"
+                name="yearEstablished"
+                value={formData.yearEstablished}
+                onChange={handleChange}
+                min="1900"
+                max="2100"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+              />
+            </div>
+            <div>
+              <label htmlFor="yearBuiltConstructed" className="block text-gray-700 font-semibold mb-2">
+                Year Built/Construction <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="yearBuiltConstructed"
+                name="yearBuiltConstructed"
+                value={formData.yearBuiltConstructed}
+                onChange={handleChange}
+                min="1900"
+                max="2100"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+              />
+            </div>
+          </div>
+
+          {/* Ownership Status */}
+          <div>
+            <label htmlFor="ownershipStatus" className="block text-gray-700 font-semibold mb-2">
+              Ownership Status <span className="text-red-500">*</span>
+            </label>
+            <select
+              id="ownershipStatus"
+              name="ownershipStatus"
+              value={formData.ownershipStatus}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 bg-white"
+            >
+              <option value="owned">Owned</option>
+              <option value="leased">Leased</option>
+              <option value="rented">Rented</option>
+            </select>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t-2 border-gray-200 pt-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">Facility Manager</h2>
+          </div>
+
+          {/* Facility Manager Name, Phone, Email */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.facilityManager?.name || ''}
+              onChange={(e) => handleFacilityManagerChange('name', e.target.value)}
+              placeholder="Facility manager name"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Phone <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              value={formData.facilityManager?.phone || ''}
+              onChange={(e) => handleFacilityManagerChange('phone', e.target.value)}
+              placeholder="e.g., +852 2234 5678"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              value={formData.facilityManager?.email || ''}
+              onChange={(e) => handleFacilityManagerChange('email', e.target.value)}
+              placeholder="email@example.com"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+            />
+          </div>
+
+          {/* Divider */}
+          <div className="border-t-2 border-gray-200 pt-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Floor Plans</h2>
+              <button
+                type="button"
+                onClick={addFloorPlan}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold text-sm"
+              >
+                + Add Floor Plan
+              </button>
+            </div>
+          </div>
+
+          {/* Floor Plans Array */}
+          <div className="space-y-4">
+            {formData.floorPlans && formData.floorPlans.length > 0 ? (
+              formData.floorPlans.map((floor: any, index: number) => (
+                <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="font-semibold text-gray-800">Floor {index + 1}</h3>
+                    <button
+                      type="button"
+                      onClick={() => removeFloorPlan(index)}
+                      className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                        Floor Label <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={floor.label}
+                        onChange={(e) => updateFloorPlan(index, 'label', e.target.value)}
+                        placeholder="e.g., Ground Floor, 1st Floor"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                        Floor Plan URL <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={floor.url}
+                        onChange={(e) => updateFloorPlan(index, 'url', e.target.value)}
+                        placeholder="e.g., /prop-001-floor-1.jpg"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-gray-900 placeholder-gray-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-600">
+                No floor plans added yet. Click &quot;+Add Floor Plan&quot; to add one.
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
