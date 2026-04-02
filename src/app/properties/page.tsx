@@ -70,26 +70,38 @@ export default function PropertiesPage() {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-800">{t('properties')}</h1>
-          <p className="text-gray-600 mt-1">{t('manageAllProperties')}</p>
+        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">{t('properties')}</h1>
+            <p className="text-gray-600 mt-1">{t('manageAllProperties')}</p>
+          </div>
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <Link
+                href={`/properties/create`}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                title="Edit property"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                  />
+                </svg>
+              </Link>
+          )}
         </div>
-      </div>
-
+      </div> 
       {/* Content */}
        
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {(user?.role === 'admin' || user?.role === 'manager') && (
-        <div className="bg-white rounded-lg shadow p-4 mb-6 flex justify-between items-center">
-          <h2 className="text-lg font-bold text-gray-800">{t('manageAllProperties')}</h2>
-          <Link
-            href="/properties/create"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
-          >
-            + {t('create')} {t('properties')}
-          </Link>
-        </div> 
-        )}
+        
 
         {/* Filter */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -203,4 +215,4 @@ export default function PropertiesPage() {
       </div>
     </div>
   );
-}
+}[]
