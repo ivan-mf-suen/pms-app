@@ -1,12 +1,14 @@
 'use client';
 
-import { mockMaintenanceRequests, mockProperties, mockInventory } from '@/lib/mockData';
+import { mockMaintenanceRequests, mockProperties, mockInventory, MaintenanceRequest } from '@/lib/mockData';
+import MaintenanceEditModal from '@/components/MaintenanceEditModal';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useParams, useRouter } from 'next/navigation';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Download, X } from 'lucide-react';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString + 'T00:00:00');
@@ -20,6 +22,9 @@ export default function MaintenanceDetailPage() {
   const params = useParams();
   const { id } = params as { id: string };
   const [isApproving, setIsApproving] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [request, setRequest] = useState<MaintenanceRequest | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Helper to get maintenance request from localStorage or mock data
   const getMaintenanceRequest = () => {
@@ -38,8 +43,11 @@ export default function MaintenanceDetailPage() {
     return mockMaintenanceRequests.find(r => r.id === id);
   };
 
-  // Resolve params synchronously by finding the maintenance request
-  const request = getMaintenanceRequest();
+  useEffect(() => {
+    const maintenanceRequest = getMaintenanceRequest();
+    setRequest(maintenanceRequest || null);
+    setIsLoading(false);
+  }, [id]);
   const property = request ? mockProperties.find((p) => p.id === request.propertyId) : null;
   const linkedInventory = request && request.inventoryId ? mockInventory.find((inv) => inv.id === request.inventoryId) : null;
 
@@ -157,6 +165,45 @@ export default function MaintenanceDetailPage() {
     }
   };
 
+  const handleEditSave = (updatedMaintenance: MaintenanceRequest & { attachedFiles?: any[] }) => {
+    // Save to localStorage
+    const saved = localStorage.getItem('maintenanceRequests');
+    const savedRequests = saved ? JSON.parse(saved) : [];
+    const index = savedRequests.findIndex((r: any) => r.id === id);
+    
+    if (index >= 0) {
+      savedRequests[index] = updatedMaintenance;
+    } else {
+      savedRequests.push(updatedMaintenance);
+    }
+    
+    localStorage.setItem('maintenanceRequests', JSON.stringify(savedRequests));
+    setRequest(updatedMaintenance);
+    setIsEditModalOpen(false);
+    alert(t('success'));
+  };
+
+  const handleDownloadFile = (file: any) => {
+    const link = document.createElement('a');
+    link.href = file.base64Content;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Show loading state while fetching data
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 text-lg">{t('loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show 404 only after loading is complete and request still doesn't exist
   if (!request) {
     notFound();
   }
@@ -226,6 +273,12 @@ export default function MaintenanceDetailPage() {
               >
                 {t(`maintenanceStatus_${request.status}`)}
               </span>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+              >
+                {t('edit')}
+              </button>
             </div>
           </div>
         </div>
@@ -309,6 +362,37 @@ export default function MaintenanceDetailPage() {
               </div>
             </div>
           )}
+
+          {/* Attached Files */}
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">{t('attachedFiles')}</h2>
+            {request && (request as any).attachedFiles && (request as any).attachedFiles.length > 0 ? (
+              <div className="space-y-2">
+                {(request as any).attachedFiles.map((file: any) => (
+                  <div
+                    key={file.id}
+                    className="flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-gray-800">{file.name}</p>
+                      <p className="text-xs text-gray-600">
+                        {(file.size / 1024).toFixed(2)} KB • {new Date(file.uploadDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleDownloadFile(file)}
+                      className="ml-2 p-2 text-blue-600 hover:bg-blue-50 rounded transition"
+                      title={t('download')}
+                    >
+                      <Download size={18} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">{t('noFilesAttached')}</p>
+            )}
+          </div>
 
           {/* Financial Summary */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -463,6 +547,16 @@ export default function MaintenanceDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {request && (
+        <MaintenanceEditModal
+          isOpen={isEditModalOpen}
+          maintenance={request}
+          onSave={handleEditSave}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

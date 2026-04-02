@@ -2,7 +2,12 @@
 
 import PropertyCard from '@/components/PropertyCard';
 import PropertyRow from '@/components/PropertyRow';
-import { mockProperties } from '@/lib/mockData';
+import { mockProperties, mockInventory, mockMaintenanceRequests, mockWorkOrders } from '@/lib/mockData';
+import {
+  getPropertiesWithExpiredWarranties,
+  getPropertiesWithMaintenanceRequests,
+  getPropertiesWithWorkOrders,
+} from '@/lib/filterUtils';
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,7 +16,7 @@ import Link from 'next/link';
 export default function PropertiesPage() {
   const { t } = useI18n();
   const { user } = useAuth();
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<'all' | 'expired' | 'maintenance' | 'workorders'>('all');
   const [allProperties, setAllProperties] = useState(mockProperties);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -45,10 +50,22 @@ export default function PropertiesPage() {
     }
   }, [viewMode]);
 
-  const filtered = filter === 'all' 
-    ? allProperties 
-    : allProperties.filter((p) => p.status === filter);
+  const getFilteredProperties = (): typeof allProperties => {
+    switch (filter) {
+      case 'expired':
+        return getPropertiesWithExpiredWarranties(allProperties, mockInventory);
+      case 'maintenance':
+        return getPropertiesWithMaintenanceRequests(allProperties, mockMaintenanceRequests);
+      case 'workorders':
+        return getPropertiesWithWorkOrders(allProperties, mockWorkOrders);
+      case 'all':
+      default:
+        return allProperties;
+    }
+  };
 
+  const filtered = getFilteredProperties();
+  
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -86,27 +103,17 @@ export default function PropertiesPage() {
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                 }`}
               >
-                {t('allProperties')} ({allProperties.length})
+                {t('propertyFilter_allAssets')} ({allProperties.length})
               </button>
               <button
-                onClick={() => setFilter('occupied')}
+                onClick={() => setFilter('expired')}
                 className={`px-4 py-2 rounded transition ${
-                  filter === 'occupied'
-                    ? 'bg-green-600 text-white'
+                  filter === 'expired'
+                    ? 'bg-red-600 text-white'
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                 }`}
               >
-                {t('propertyStatus_occupied')} ({allProperties.filter((p) => p.status === 'occupied').length})
-              </button>
-              <button
-                onClick={() => setFilter('available')}
-                className={`px-4 py-2 rounded transition ${
-                  filter === 'available'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
-              >
-                {t('propertyStatus_available')} ({mockProperties.filter((p) => p.status === 'available').length})
+                {t('propertyFilter_expiredItems')} ({getPropertiesWithExpiredWarranties(allProperties, mockInventory).length})
               </button>
               <button
                 onClick={() => setFilter('maintenance')}
@@ -116,7 +123,17 @@ export default function PropertiesPage() {
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                 }`}
               >
-                {t('propertyStatus_maintenance')} ({mockProperties.filter((p) => p.status === 'maintenance').length})
+                {t('propertyFilter_maintenanceRequests')} ({getPropertiesWithMaintenanceRequests(allProperties, mockMaintenanceRequests).length})
+              </button>
+              <button
+                onClick={() => setFilter('workorders')}
+                className={`px-4 py-2 rounded transition ${
+                  filter === 'workorders'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {t('propertyFilter_workOrders')} ({getPropertiesWithWorkOrders(allProperties, mockWorkOrders).length})
               </button>
             </div>
 

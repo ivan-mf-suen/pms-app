@@ -32,6 +32,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     create: 'Create',
     edit: 'Edit',
     delete: 'Delete',
+    download: 'Download',
     save: 'Save',
     cancel: 'Cancel',
     close: 'Close',
@@ -60,6 +61,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
 
     // Properties
     allProperties: 'All Properties',
+    propertyFilter_allAssets: 'All Assets',
+    propertyFilter_expiredItems: 'Expired Items',
+    propertyFilter_maintenanceRequests: 'Maintenance Requests',
+    propertyFilter_workOrders: 'Work Orders',
     propertyDetails: 'Property Details',
     propertyType: 'Property Type',
     address: 'Address',
@@ -212,6 +217,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     quantity: 'Quantity',
     condition: 'Condition',
     lastVerified: 'Last Verified',
+    attachedFiles: 'Attached Files',
+    uploadFiles: 'Upload Files',
+    noFilesAttached: 'No files attached',
+    deleteFile: 'Delete File',
 
     // Documents
     document: 'Document',
@@ -333,6 +342,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     create: '新增',
     edit: '編輯',
     delete: '刪除',
+    download: '下載',
     save: '儲存',
     cancel: '取消',
     close: '關閉',
@@ -361,6 +371,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
 
     // Properties
     allProperties: '所有資產',
+    propertyFilter_allAssets: '所有資產',
+    propertyFilter_expiredItems: '已過期項目',
+    propertyFilter_maintenanceRequests: '維護請求',
+    propertyFilter_workOrders: '工作單',
     propertyDetails: '資產詳情',
     propertyType: '資產類型',
     address: '地址',
@@ -513,6 +527,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     quantity: '數量',
     condition: '狀況',
     lastVerified: '最後驗證',
+    attachedFiles: '附加文件',
+    uploadFiles: '上傳文件',
+    noFilesAttached: '未附加任何文件',
+    deleteFile: '刪除文件',
 
     // Documents
     document: '文件',

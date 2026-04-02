@@ -63,6 +63,14 @@ export interface MaintenanceRequest {
   approvedBy?: string; // Who approved
   approvedDate?: string; // When approved
   rejectionReason?: string; // Why rejected (if canceled)
+  attachedFiles?: Array<{
+    id: string;
+    name: string;
+    size: number;
+    type: string;
+    uploadDate: string;
+    base64Content: string;
+  }>;
 }
 
 export interface Payment {

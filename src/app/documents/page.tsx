@@ -3,6 +3,8 @@
 import { useI18n } from '@/contexts/I18nContext';
 import { mockDocuments, mockProperties, mockMaintenanceRequests, mockWorkOrders } from '@/lib/mockData';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Download, Trash2 } from 'lucide-react';
 
 export default function DocumentsPage() {
   const { t } = useI18n();
@@ -109,6 +111,21 @@ export default function DocumentsPage() {
 
   const handleDelete = (docId: string) => {
     setDocuments(documents.filter((d) => d.id !== docId));
+  };
+
+  const handleDownloadDocument = (doc: any) => {
+    if (doc.base64Content) {
+      // If document has base64 content, download from that
+      const link = document.createElement('a');
+      link.href = doc.base64Content;
+      link.download = doc.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      // For mock documents without content, show a message
+      alert(`Download support for ${doc.name} would be implemented in production with actual file storage.`);
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -247,18 +264,36 @@ export default function DocumentsPage() {
                       <td className="px-6 py-4 text-sm">
                         <div className="space-y-1">
                           {property && (
-                            <div className="text-xs text-gray-600">
-                              <span className="font-semibold">Property:</span> {property.address}
+                            <div className="text-xs">
+                              <span className="font-semibold text-gray-600">Property:</span>{' '}
+                              <Link
+                                href={`/properties/${property.id}`}
+                                className="text-blue-600 hover:underline hover:text-blue-800"
+                              >
+                                {property.address}
+                              </Link>
                             </div>
                           )}
                           {maintenance && (
-                            <div className="text-xs text-gray-600">
-                              <span className="font-semibold">Maintenance:</span> {maintenance.title}
+                            <div className="text-xs">
+                              <span className="font-semibold text-gray-600">Maintenance:</span>{' '}
+                              <Link
+                                href={`/maintenance/${maintenance.id}`}
+                                className="text-blue-600 hover:underline hover:text-blue-800"
+                              >
+                                {maintenance.title}
+                              </Link>
                             </div>
                           )}
                           {workOrder && (
-                            <div className="text-xs text-gray-600">
-                              <span className="font-semibold">Work Order:</span> {workOrder.controlNumber}
+                            <div className="text-xs">
+                              <span className="font-semibold text-gray-600">Work Order:</span>{' '}
+                              <Link
+                                href={`/work-orders/${workOrder.id}`}
+                                className="text-blue-600 hover:underline hover:text-blue-800"
+                              >
+                                {workOrder.controlNumber}
+                              </Link>
                             </div>
                           )}
                           {!property && !maintenance && !workOrder && (
@@ -268,12 +303,22 @@ export default function DocumentsPage() {
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-800">{doc.uploadDate}</td>
                       <td className="px-6 py-4 text-sm">
-                        <button
-                          onClick={() => handleDelete(doc.id)}
-                          className="text-red-600 hover:text-red-800 hover:underline font-semibold"
-                        >
-                          Delete
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDownloadDocument(doc)}
+                            className="text-blue-600 hover:text-blue-800 transition p-1"
+                            title={t('download')}
+                          >
+                            <Download size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(doc.id)}
+                            className="text-red-600 hover:text-red-800 transition p-1"
+                            title={t('delete')}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                     );
