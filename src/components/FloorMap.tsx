@@ -11,6 +11,7 @@ interface FloorMapProps {
   floorPlanUrl?: string;
   inventory: Inventory[];
   currentFloorLabel?: string;
+  selectedInventoryId?: string | null;
 }
 
 const typeIcons: Record<string, string> = {
@@ -31,7 +32,7 @@ const typeColors: Record<string, string> = {
   other: 'bg-gray-100 text-gray-700',
 };
 
-export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentFloorLabel }: FloorMapProps) {
+export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentFloorLabel, selectedInventoryId }: FloorMapProps) {
   const router = useRouter();
   const { t } = useI18n();
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
@@ -87,8 +88,8 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentF
         </div>
       </div>
       
-      <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden border border-gray-300" style={{ aspectRatio: '4/3', overflow: 'auto' }}>
-        <div style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top left', width: '100%', height: '100%', position: 'relative' }}>
+      <div className="relative w-full bg-gray-100 rounded-lg border border-gray-300" style={{ aspectRatio: '4/3', overflowY: 'auto', overflowX: 'auto', overflow: 'visible' }}>
+        <div style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top left', width: '100%', height: '100%', position: 'relative', overflow: 'visible', pointerEvents: 'auto' }}>
           {/* Floor Plan Background Image */}
           <Image
             src={floorPlanUrl}
@@ -120,7 +121,11 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentF
               >
                 {/* Marker Circle */}
                 <div
-                  className={`relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl transition-all duration-200 ${colorClass} border-2 border-white shadow-md hover:shadow-lg hover:scale-110`}
+                  className={`relative w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl transition-all duration-200 ${colorClass} border-2 ${
+                    selectedInventoryId === inv.id
+                      ? 'border-blue-500 shadow-lg shadow-blue-400 scale-125'
+                      : 'border-white shadow-md hover:shadow-lg hover:scale-110'
+                  }`}
                 >
                   {icon}
                   {location.quantity > 1 && (
@@ -130,14 +135,31 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentF
                   )}
                 </div>
 
-                {/* Tooltip on Hover */}
-                {isHovered && (
-                  <div className="absolute left-1/2 bottom-full mb-2 -translate-x-1/2 bg-gray-900 text-white px-3 py-2 rounded shadow-lg whitespace-nowrap text-sm z-50">
+                {/* Tooltip on Hover or Selection */}
+                {(isHovered || selectedInventoryId === inv.id) && (
+                  <div className={`fixed left-1/2 -translate-x-1/2 ${selectedInventoryId === inv.id ? 'z-50' : 'z-40'} pointer-events-auto`} style={{
+                    top: selectedInventoryId === inv.id ? '60px' : 'auto',
+                  }}>
+                    <div className={`${
+                      selectedInventoryId === inv.id
+                        ? 'bg-blue-900 text-white px-4 py-3 rounded-lg shadow-xl min-w-max'
+                        : 'bg-gray-900 text-white px-3 py-2 rounded shadow-lg whitespace-nowrap text-sm'
+                    }`}>
                     <p className="font-semibold">{inv.brand} {inv.model}</p>
                     <p className="text-gray-300 text-xs">{t(`type_${inv.type}`)}</p>
                     <p className="text-gray-400 text-xs">{location.address}</p>
-                    <p className="text-yellow-300 text-xs">Click to view details</p>
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+                    {selectedInventoryId === inv.id && (
+                      <>
+                        <p className="text-gray-300 text-xs mt-2 pt-2 border-t border-gray-600">
+                          <span className="font-semibold">Qty:</span> {location.quantity}
+                        </p>
+                        <p className="text-gray-300 text-xs">
+                          <span className="font-semibold">Floor:</span> {location.floorPlanName || 'N/A'}
+                        </p>
+                      </>
+                    )}
+                    <p className="text-yellow-300 text-xs mt-1">Click to view details</p>
+                    </div>
                   </div>
                 )}
               </div>

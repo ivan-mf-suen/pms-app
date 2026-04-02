@@ -5,11 +5,16 @@ import { mockWorkOrders, mockProperties } from '@/lib/mockData';
 import { exportToExcel, downloadCSV, generateCSV, ExportColumn } from '@/lib/exportUtils';
 import Link from 'next/link';
 import { useState } from 'react';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 export default function WorkOrdersPage() {
   const { t } = useI18n();
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterProperty, setFilterProperty] = useState<string>('all');
+  const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' }>({
+    column: 'createdDate',
+    direction: 'desc',
+  });
 
   // Merge mockData with localStorage work orders
   const getAllWorkOrders = () => {
@@ -43,6 +48,26 @@ export default function WorkOrdersPage() {
     return { cumulative, threshold, exceedsThreshold };
   };
 
+  // Sort function handler
+  const handleSort = (column: string) => {
+    setSortConfig((prev) => ({
+      column,
+      direction: prev.column === column && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  // Get sort icon for column
+ const getSortIcon = (column: string) => {
+    if (sortConfig.column !== column) {
+      return <ChevronsUpDown className="w-4 h-4 text-gray-400 inline ml-1" />;
+    }
+    return sortConfig.direction === 'asc' ? (
+      <ChevronUp className="w-4 h-4 text-blue-600 inline ml-1" />
+    ) : (
+      <ChevronDown className="w-4 h-4 text-blue-600 inline ml-1" />
+    );
+  };
+
   // Filter work orders
   let filtered = getAllWorkOrders();
 
@@ -53,6 +78,57 @@ export default function WorkOrdersPage() {
   if (filterProperty !== 'all') {
     filtered = filtered.filter((wo) => wo.propertyId === filterProperty);
   }
+
+  // Sort work orders
+  const sortedFiltered = [...filtered].sort((a, b) => {
+    const { column, direction } = sortConfig;
+    let aValue: any = '';
+    let bValue: any = '';
+
+    if (column === 'controlNumber') {
+      aValue = a.controlNumber;
+      bValue = b.controlNumber;
+    } else if (column === 'properties') {
+      const propA = mockProperties.find((p) => p.id === a.propertyId);
+      const propB = mockProperties.find((p) => p.id === b.propertyId);
+      aValue = propA?.address || '';
+      bValue = propB?.address || '';
+    } else if (column === 'status') {
+      aValue = a.status;
+      bValue = b.status;
+    } else if (column === 'priority') {
+      const priorityOrder = { low: 0, medium: 1, high: 2, urgent: 3 };
+      aValue = priorityOrder[a.priority as keyof typeof priorityOrder] ?? 999;
+      bValue = priorityOrder[b.priority as keyof typeof priorityOrder] ?? 999;
+    } else if (column === 'original') {
+      aValue = a.financials.original;
+      bValue = b.financials.original;
+    } else if (column === 'voApproved') {
+      aValue = a.financials.voApproved;
+      bValue = b.financials.voApproved;
+    } else if (column === 'contingency') {
+      aValue = a.financials.contingency;
+      bValue = b.financials.contingency;
+    } else if (column === 'cumulative') {
+      const aCum = a.financials.original + a.financials.voApproved + a.financials.contingency;
+      const bCum = b.financials.original + b.financials.voApproved + b.financials.contingency;
+      aValue = aCum;
+      bValue = bCum;
+    } else if (column === 'createdDate') {
+      aValue = new Date(a.createdDate).getTime();
+      bValue = new Date(b.createdDate).getTime();
+    }
+
+    // Compare values
+    let comparison = 0;
+    if (typeof aValue === 'string') {
+      comparison = aValue.localeCompare(bValue);
+    } else {
+      comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    }
+
+    return direction === 'asc' ? comparison : -comparison;
+  });
 
   // Export functions
   const handleExportExcel = async () => {
@@ -205,25 +281,60 @@ export default function WorkOrdersPage() {
             <table className="w-full">
               <thead className="bg-gray-100 border-b">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('controlNumber')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('properties')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('workOrderStatus')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('priority')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('cumulative')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('Threshold')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('createdDate')}</th>
+                  <th 
+                    onClick={() => handleSort('controlNumber')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    {t('controlNumber')}{getSortIcon('controlNumber')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('properties')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    {t('properties')}{getSortIcon('properties')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('status')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    {t('workOrderStatus')}{getSortIcon('status')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('priority')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    {t('priority')}{getSortIcon('priority')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('cumulative')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    {t('cumulative')}{getSortIcon('cumulative')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('status')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    {t('Threshold')}{getSortIcon('status')}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('createdDate')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                  >
+                    {t('createdDate')}{getSortIcon('createdDate')}
+                  </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {filtered.length === 0 ? (
+                {sortedFiltered.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
                       No work orders found matching the selected filters.
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((wo) => {
+                  sortedFiltered.map((wo) => {
                     const property = mockProperties.find((p) => p.id === wo.propertyId);
                     const { cumulative, exceedsThreshold } = getCumulativeAndThreshold(wo);
 

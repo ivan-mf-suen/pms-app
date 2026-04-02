@@ -19,6 +19,10 @@ export default function PropertiesPage() {
   const [filter, setFilter] = useState<'all' | 'expired' | 'maintenance' | 'workorders'>('all');
   const [allProperties, setAllProperties] = useState(mockProperties);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' }>({
+    column: 'address',
+    direction: 'asc',
+  });
 
   // Load view mode and properties from localStorage on mount
   useEffect(() => {
@@ -65,6 +69,50 @@ export default function PropertiesPage() {
   };
 
   const filtered = getFilteredProperties();
+
+  // Sort handler
+  const handleSort = (column: string) => {
+    setSortConfig((prev) => ({
+      column,
+      direction: prev.column === column && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  // Get sort icon
+  const getSortIcon = (column: string) => {
+    if (sortConfig.column !== column) return ' ↕';
+    return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  // Sort properties
+  const sortedFiltered = [...filtered].sort((a, b) => {
+    const { column, direction } = sortConfig;
+    let aValue: any = '';
+    let bValue: any = '';
+
+    if (column === 'address') {
+      aValue = a.address;
+      bValue = b.address;
+    } else if (column === 'type') {
+      aValue = a.propertyType;
+      bValue = b.propertyType;
+    } else if (column === 'bedrooms') {
+      aValue = a.bedrooms;
+      bValue = b.bedrooms;
+    } else if (column === 'status') {
+      aValue = a.status;
+      bValue = b.status;
+    }
+
+    let comparison = 0;
+    if (typeof aValue === 'string') {
+      comparison = aValue.localeCompare(bValue);
+    } else {
+      comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    }
+
+    return direction === 'asc' ? comparison : -comparison;
+  });
   
   return (
     <div className="min-h-screen bg-gray-100">
@@ -190,15 +238,30 @@ export default function PropertiesPage() {
               <table className="w-full">
                 <thead className="bg-gray-100 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('address')}</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('location')}</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('status')}</th>
+                    <th 
+                      onClick={() => handleSort('address')}
+                      className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('address')}{getSortIcon('address')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('type')}
+                      className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('location')}{getSortIcon('type')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('status')}
+                      className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('status')}{getSortIcon('status')}
+                    </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('expiredWarranties') || 'Warranty Expiring'}</th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('workOrders')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {filtered.map((property) => (
+                  {sortedFiltered.map((property) => (
                     <PropertyRow key={property.id} property={property} />
                   ))}
                 </tbody>

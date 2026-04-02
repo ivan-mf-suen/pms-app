@@ -8,7 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 import FloorMap from '@/components/FloorMap';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function PropertyDetailPage() {
   const params = useParams();
@@ -19,6 +19,8 @@ export default function PropertyDetailPage() {
   const [property, setProperty] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFloorIndex, setSelectedFloorIndex] = useState(0);
+  const [selectedInventoryId, setSelectedInventoryId] = useState<string | null>(null);
+  const floorMapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -74,6 +76,15 @@ export default function PropertyDetailPage() {
 
   const isWarrantyExpired = (warrantyEnd: string): boolean => {
     return getWarrantyDaysRemaining(warrantyEnd) < 0;
+  };
+
+  // Handler to show item on floor map
+  const handleShowOnMap = (inventoryId: string) => {
+    setSelectedInventoryId(inventoryId);
+    // Scroll to floor map section
+    setTimeout(() => {
+      floorMapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
   };
 
   return (
@@ -144,7 +155,7 @@ export default function PropertyDetailPage() {
 
 
             {/* Floor Map Section */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-white rounded-lg shadow overflow-hidden" ref={floorMapRef}>
               {/* Floor Plan Tabs */}
               {property.floorPlans && property.floorPlans.length > 1 && (
                 <div className="border-b bg-gray-50 p-4">
@@ -169,6 +180,7 @@ export default function PropertyDetailPage() {
                 floorPlanUrl={property.floorPlans?.[selectedFloorIndex]?.url || property.floorPlanUrl}
                 inventory={mockInventory}
                 currentFloorLabel={property.floorPlans?.[selectedFloorIndex]?.label}
+                selectedInventoryId={selectedInventoryId}
               />
             </div>
             {/* Product Inventory Details */}
@@ -260,9 +272,21 @@ export default function PropertyDetailPage() {
                             </div>
                           </div>
                         </div>
-                        <p className="text-blue-600 text-xs mt-3 font-semibold">
-                          {t('viewDetails')} →
-                        </p>
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="text-blue-600 text-xs font-semibold">
+                            {t('viewDetails')} →
+                          </p>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleShowOnMap(item.id);
+                            }}
+                            className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-600 hover:bg-blue-200 rounded text-sm font-semibold transition"
+                            title="Show on floor map"
+                          >
+                            🗺️ {t('map') || 'Map'}
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
