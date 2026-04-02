@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Inventory } from '@/lib/mockData';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface FloorMapProps {
   propertyId: string;
@@ -32,7 +33,9 @@ const typeColors: Record<string, string> = {
 
 export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentFloorLabel }: FloorMapProps) {
   const router = useRouter();
+  const { t } = useI18n();
   const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(100);
 
   // Filter inventory items that are located in this property and on current floor
   const propertyInventory = inventory
@@ -63,20 +66,40 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentF
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-xl font-bold text-gray-800 mb-4">Property Floor Map</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold text-gray-800">Property Floor Map</h3>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setZoomLevel(prev => Math.max(50, prev - 20))}
+            className="px-3 py-1 bg-blue-600 hover:bg-gray-300 hover:text-white rounded text-sm font-semibold transition"
+            title={t('zoomOut')}
+          >
+            {t('zoomOut')}
+          </button>
+          <span className="text-sm font-semibold text-gray-700 min-w-12 text-center">{zoomLevel}%</span>
+          <button
+            onClick={() => setZoomLevel(prev => Math.min(200, prev + 20))}
+            className="px-3 py-1 bg-blue-600 hover:bg-gray-300 hover:text-white rounded text-sm font-semibold transition"
+            title={t('zoomIn')}
+          >
+            {t('zoomIn')}
+          </button>
+        </div>
+      </div>
       
-      <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden border border-gray-300" style={{ aspectRatio: '4/3' }}>
-        {/* Floor Plan Background Image */}
-        <Image
-          src={floorPlanUrl}
-          alt="Floor Plan"
-          fill
-          className="object-cover"
-          priority={false}
-        />
+      <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden border border-gray-300" style={{ aspectRatio: '4/3', overflow: 'auto' }}>
+        <div style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'top left', width: '100%', height: '100%', position: 'relative' }}>
+          {/* Floor Plan Background Image */}
+          <Image
+            src={floorPlanUrl}
+            alt="Floor Plan"
+            fill
+            className="object-cover"
+            priority={false}
+          />
 
-        {/* Inventory Markers */}
-        {propertyInventory.map((inv) =>
+          {/* Inventory Markers */}
+          {propertyInventory.map((inv) =>
           inv.locations.map((location) => {
             const markerId = `${inv.id}-${location.id}`;
             const icon = typeIcons[inv.type] || '📦';
@@ -111,7 +134,7 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentF
                 {isHovered && (
                   <div className="absolute left-1/2 bottom-full mb-2 -translate-x-1/2 bg-gray-900 text-white px-3 py-2 rounded shadow-lg whitespace-nowrap text-sm z-50">
                     <p className="font-semibold">{inv.brand} {inv.model}</p>
-                    <p className="text-gray-300 text-xs">{inv.type}</p>
+                    <p className="text-gray-300 text-xs">{t(`type_${inv.type}`)}</p>
                     <p className="text-gray-400 text-xs">{location.address}</p>
                     <p className="text-yellow-300 text-xs">Click to view details</p>
                     <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
@@ -121,6 +144,7 @@ export default function FloorMap({ propertyId, floorPlanUrl, inventory, currentF
             );
           })
         )}
+        </div>
       </div>
 
       {/* Legend */}

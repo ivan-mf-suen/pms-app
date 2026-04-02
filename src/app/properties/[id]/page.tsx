@@ -216,6 +216,10 @@ export default function PropertyDetailPage() {
                             </div>
                           </div>
                           <div>
+                            <p className="text-gray-600 text-sm font-semibold">{t('floorPlanName')}</p>
+                            <p className="font-semibold text-gray-800">{firstLocation?.floorPlanName || 'N/A'}</p>
+                          </div>
+                          <div>
                             <p className="text-gray-600 text-sm font-semibold">{t('status')}</p>
                             <span
                               className={`inline-block px-3 py-1 rounded text-xs font-semibold ${firstLocation?.status === 'active'
