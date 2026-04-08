@@ -118,14 +118,16 @@ export default function CreateWorkOrderPage() {
         remarks: remarks ? [{
           id: `remark-${Date.now()}`,
           text: remarks,
-          author: user?.name || 'Unknown',
+          author: user?.email || 'unknown',
+          username: user ? `${user.role.charAt(0).toUpperCase() + user.role.slice(1)} - ${user.name}` : 'Unknown',
           timestamp: new Date().toISOString()
         }] : [],
         auditLog: [
           {
             id: `audit-${Date.now()}`,
             action: 'create' as const,
-            actor: user?.name || 'Unknown',
+            actor: user?.email || 'unknown',
+            username: user ? `${user.role.charAt(0).toUpperCase() + user.role.slice(1)} - ${user.name}` : 'Unknown',
             timestamp: new Date().toISOString(),
             entityType: 'work_order' as const,
             entityId: `wo-${Date.now()}`,

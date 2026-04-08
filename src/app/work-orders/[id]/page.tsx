@@ -309,7 +309,7 @@ export default function WorkOrderDetailPage() {
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">{t('remarks')}</h2>
               <div className="space-y-4">
-                {wo.remarks.map((remark) => (
+                {wo.remarks.map((remark: any) => (
                   <div key={remark.id} className="border border-gray-200 rounded p-4 bg-gray-50">
                     <div className="flex justify-between items-start mb-2">
                       <p className="font-semibold text-gray-800">{remark.username || remark.author}</p>
@@ -482,7 +482,7 @@ export default function WorkOrderDetailPage() {
 
               {auditExpanded && (
                 <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {wo.auditLog.map((entry) => (
+                  {wo.auditLog.map((entry: any) => (
                     <div key={entry.id} className="border border-gray-200 rounded p-4 bg-gray-50">
                       <div className="flex justify-between items-start mb-2">
                         <div>

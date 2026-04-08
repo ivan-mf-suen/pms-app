@@ -62,16 +62,7 @@ export default function Navbar() {
               >
                 {t('inventory')}
               </Link>
-              <Link
-                href="/work-orders"
-                className={`hover:text-blue-200 transition ${
-                  isActive('/work-orders')
-                    ? 'text-blue-300 border-b-2 border-blue-300'
-                    : ''
-                }`}
-              >
-                {t('workOrders')}
-              </Link>
+             
               <Link
                 href="/maintenance"
                 className={`hover:text-blue-200 transition ${
@@ -81,6 +72,17 @@ export default function Navbar() {
                 }`}
               >
                 {t('maintenance')}
+              </Link>
+
+               <Link
+                href="/work-orders"
+                className={`hover:text-blue-200 transition ${
+                  isActive('/work-orders')
+                    ? 'text-blue-300 border-b-2 border-blue-300'
+                    : ''
+                }`}
+              >
+                {t('workOrders')}
               </Link>
               <Link
                 href="/documents"
