@@ -5,16 +5,21 @@ import { mockInventory, mockProperties } from '@/lib/mockData';
 import { exportToExcel, downloadCSV, generateCSV, ExportColumn } from '@/lib/exportUtils';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 import InventoryCard from '@/components/InventoryCard';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 export default function InventoryPage() {
   const { t } = useI18n();
   const router = useRouter();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const [filterProperty, setFilterProperty] = useState<string>('all');
   const [filterWarranty, setFilterWarranty] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
+  const [filterPropertyType, setFilterPropertyType] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' }>({
     column: 'brand',
@@ -88,6 +93,26 @@ export default function InventoryPage() {
       item.locations.some(
         (loc) => !isWarrantyExpired(loc.warrantyEnd) && !isWarrantyExpiring(loc.warrantyEnd)
       )
+    );
+  }
+
+  // Filter by property type
+  if (filterPropertyType !== 'all') {
+    filtered = filtered.filter((item) =>
+      item.locations.some((loc) => {
+        const property = mockProperties.find(p => p.id === loc.propertyId);
+        return property?.type === filterPropertyType;
+      })
+    );
+  }
+
+  // Search filter
+  if (searchQuery.trim() !== '') {
+    const query = searchQuery.toLowerCase();
+    filtered = filtered.filter((item) =>
+      item.brand.toLowerCase().includes(query) ||
+      item.model.toLowerCase().includes(query) ||
+      item.locations.some((loc) => loc.address.toLowerCase().includes(query))
     );
   }
 
@@ -239,9 +264,32 @@ export default function InventoryPage() {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-800">{t('inventory')}</h1>
-          <p className="text-gray-600 mt-1">{t('trackMaintenanceRequests')}</p>
+        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">{t('inventory')}</h1>
+            <p className="text-gray-600 mt-1">{t('trackMaintenanceRequests')}</p>
+          </div>
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <Link
+              href="/inventory/create"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+              title="Create new inventory"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -249,7 +297,7 @@ export default function InventoryPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Filters and Export */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2">
                 {t('properties')}
@@ -265,6 +313,23 @@ export default function InventoryPage() {
                     {prop.address}
                   </option>
                 ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Property Type
+              </label>
+              <select
+                value={filterPropertyType}
+                onChange={(e) => setFilterPropertyType(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Types</option>
+                <option value="kindergarten">Kindergarten</option>
+                <option value="primarysecondaryschool">Primary/Secondary School</option>
+                <option value="secondaryschool">Secondary School</option>
+                <option value="internationalschool">International School</option>
               </select>
             </div>
 
@@ -302,21 +367,20 @@ export default function InventoryPage() {
                 <option value="expired">{t('warrantyExpired')}</option>
               </select>
             </div>
+          </div>
 
-            {/* <div className="flex items-end gap-2">
-              <button
-                onClick={handleExportExcel}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-              >
-                {t('exportToExcel')}
-              </button>
-              <button
-                onClick={handleExportCSV}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                {t('exportToCSV')}
-              </button>
-            </div> */}
+          {/* Search Input */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
+              Search Inventory
+            </label>
+            <input
+              type="text"
+              placeholder="Search by brand, model, or location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           <div className="flex justify-between items-center">

@@ -5,11 +5,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { useParams, useRouter } from 'next/navigation';
 import { useI18n } from '@/contexts/I18nContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function InventoryDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { t } = useI18n();
+  const { user } = useAuth();
   const { id } = params as { id: string };
 
   const item = mockInventory.find((inv) => inv.id === id);
@@ -68,6 +70,7 @@ export default function InventoryDetailPage() {
               <h1 className="text-3xl font-bold text-gray-800">
                 {item.brand} {item.model}
               </h1>
+              
               <p className="text-gray-600 mt-2">Inventory #:​ {item.id}</p>
             </div>
             <div className="flex gap-2 flex-wrap">
@@ -76,6 +79,27 @@ export default function InventoryDetailPage() {
               >
                 {t(`type_${item.type}`)}
               </span>
+              {(user?.role === 'admin' || user?.role === 'manager') && (
+                <Link
+                  href={`/inventory/${item.id}/edit`}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                  title="Edit inventory"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </Link>
+              )}
               {/* <span className="inline-block px-4 py-2 rounded-lg text-sm font-semibold bg-purple-100 text-purple-800">
                 {t('total')}: {totalQuantity} unit{totalQuantity !== 1 ? 's' : ''}
               </span> */}
