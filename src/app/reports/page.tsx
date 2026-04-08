@@ -285,11 +285,11 @@ export default function ReportsPage() {
                 </thead>
                 <tbody className="divide-y">
                   {mockWorkOrders.slice(0, 10).map((wo: any) => (
-                    <tr key={wo.id} className="hover:bg-gray-50">
+                    <tr key={wo.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/work-orders/${wo.id}`}>
                       <td className="px-6 py-4 font-semibold text-blue-600">{wo.controlNumber}</td>
-                      <td className="px-6 py-4 capitalize">{wo.status}</td>
-                      <td className="px-6 py-4 capitalize">{wo.priority}</td>
-                      <td className="px-6 py-4">{wo.createdDate}</td>
+                      <td className="px-6 py-4 capitalize text-gray-700">{wo.status}</td>
+                      <td className="px-6 py-4 capitalize text-gray-700">{wo.priority}</td>
+                      <td className="px-6 py-4 text-gray-700">{wo.createdDate}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -318,11 +318,11 @@ export default function ReportsPage() {
               </div>
               <div className="bg-white rounded-lg shadow p-6">
                 <p className="text-gray-600 text-sm font-semibold">{t('voApprovedBudget')}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-2">${fundingData.totalVOApproved.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-800 mt-2 text-gray-700" >${fundingData.totalVOApproved.toLocaleString()}</p>
               </div>
               <div className="bg-white rounded-lg shadow p-6">
                 <p className="text-gray-600 text-sm font-semibold">{t('contingencyBudget')}</p>
-                <p className="text-2xl font-bold text-gray-800 mt-2">${fundingData.totalContingency.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-800 mt-2 text-gray-700">${fundingData.totalContingency.toLocaleString()}</p>
               </div>
               <div className="bg-white rounded-lg shadow p-6 border-2 border-blue-500">
                 <p className="text-gray-600 text-sm font-semibold">{t('cumulativeSpending')}</p>
@@ -352,7 +352,7 @@ export default function ReportsPage() {
                     const cumulative = wo.financials.original + wo.financials.voApproved + wo.financials.contingency;
                     const threshold = wo.financials.original + wo.financials.contingency;
                     return (
-                      <tr key={wo.id} className="hover:bg-gray-50">
+                      <tr key={wo.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/work-orders/${wo.id}`}>
                         <td className="px-6 py-4 font-semibold text-blue-600">{wo.controlNumber}</td>
                         <td className="px-6 py-4">${wo.financials.original.toLocaleString()}</td>
                         <td className="px-6 py-4 font-semibold">${cumulative.toLocaleString()}</td>
