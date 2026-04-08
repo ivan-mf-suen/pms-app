@@ -854,6 +854,7 @@ export const mockWorkOrders: WorkOrder[] = [
     controlNumber: 'WO-2026-0002',
     propertyId: 'prop-002',
     inventoryIds: ['inv-003'],
+    maintenanceRequestId: 'maint-003',
     status: 'in_progress',
     createdDate: '2026-02-01',
     priority: 'urgent',

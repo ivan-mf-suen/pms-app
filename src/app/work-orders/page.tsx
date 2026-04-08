@@ -2,15 +2,20 @@
 
 import { useI18n } from '@/contexts/I18nContext';
 import { mockWorkOrders, mockProperties } from '@/lib/mockData';
-import { exportToExcel, downloadCSV, generateCSV, ExportColumn } from '@/lib/exportUtils';
+import { exportToExcel, generateCSV, ExportColumn } from '@/lib/exportUtils';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function WorkOrdersPage() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterProperty, setFilterProperty] = useState<string>('all');
+  const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [filterCost, setFilterCost] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortConfig, setSortConfig] = useState<{ column: string; direction: 'asc' | 'desc' }>({
     column: 'createdDate',
     direction: 'desc',
@@ -79,6 +84,37 @@ export default function WorkOrdersPage() {
     filtered = filtered.filter((wo) => wo.propertyId === filterProperty);
   }
 
+  if (filterPriority !== 'all') {
+    filtered = filtered.filter((wo) => wo.priority === filterPriority);
+  }
+
+  if (filterCost !== 'all') {
+    const cumulative = (wo: any) => wo.financials.original + wo.financials.voApproved + wo.financials.contingency;
+    if (filterCost === 'under50k') {
+      filtered = filtered.filter((wo) => cumulative(wo) < 50000);
+    } else if (filterCost === '50k-100k') {
+      filtered = filtered.filter((wo) => {
+        const cum = cumulative(wo);
+        return cum >= 50000 && cum < 100000;
+      });
+    } else if (filterCost === 'over100k') {
+      filtered = filtered.filter((wo) => cumulative(wo) >= 100000);
+    }
+  }
+
+  // Search filter
+  if (searchQuery.trim() !== '') {
+    const query = searchQuery.toLowerCase();
+    filtered = filtered.filter((wo) => {
+      const property = mockProperties.find((p) => p.id === wo.propertyId);
+      return (
+        wo.controlNumber.toLowerCase().includes(query) ||
+        (property?.address.toLowerCase().includes(query) || false) ||
+        wo.description?.toLowerCase().includes(query)
+      );
+    });
+  }
+
   // Sort work orders
   const sortedFiltered = [...filtered].sort((a, b) => {
     const { column, direction } = sortConfig;
@@ -130,7 +166,7 @@ export default function WorkOrdersPage() {
     return direction === 'asc' ? comparison : -comparison;
   });
 
-  // Export functions
+  // Export function
   const handleExportExcel = async () => {
     const columns: ExportColumn[] = [
       { key: 'controlNumber', label: 'Control Number' },
@@ -165,48 +201,36 @@ export default function WorkOrdersPage() {
     await exportToExcel(exportData, columns, `work_orders_${new Date().toISOString().split('T')[0]}`);
   };
 
-  const handleExportCSV = () => {
-    const columns: ExportColumn[] = [
-      { key: 'controlNumber', label: 'Control Number' },
-      { key: 'propertyAddress', label: 'Property' },
-      { key: 'status', label: 'Status' },
-      { key: 'priority', label: 'Priority' },
-      { key: 'original', label: 'Original' },
-      { key: 'voApproved', label: 'VO Approved' },
-      { key: 'contingency', label: 'Contingency' },
-      { key: 'cumulative', label: 'Cumulative' },
-      { key: 'exceedsThreshold', label: 'Exceeds Threshold' },
-      { key: 'createdDate', label: 'Created Date' },
-    ];
-
-    const exportData = filtered.map((wo) => {
-      const { cumulative, exceedsThreshold } = getCumulativeAndThreshold(wo);
-      const property = mockProperties.find((p) => p.id === wo.propertyId);
-      return {
-        controlNumber: wo.controlNumber,
-        propertyAddress: property?.address || wo.propertyId,
-        status: wo.status,
-        priority: wo.priority,
-        original: wo.financials.original,
-        voApproved: wo.financials.voApproved,
-        contingency: wo.financials.contingency,
-        cumulative,
-        exceedsThreshold: exceedsThreshold ? 'YES' : 'NO',
-        createdDate: wo.createdDate,
-      };
-    });
-
-    const csv = generateCSV(exportData, columns);
-    downloadCSV(csv, `work_orders_${new Date().toISOString().split('T')[0]}`);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-gray-800">{t('workOrders')}</h1>
-          <p className="text-gray-600 mt-1">Track and manage all work orders with auto-generated control numbers</p>
+        <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">{t('workOrders')}</h1>
+            <p className="text-gray-600 mt-1">Track and manage all work orders with auto-generated control numbers</p>
+          </div>
+          {(user?.role === 'admin' || user?.role === 'manager') && (
+            <Link
+              href="/work-orders/create"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+              title="Create new work order"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -214,7 +238,7 @@ export default function WorkOrdersPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Filters and Export */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2">
                 {t('workOrderStatus')}
@@ -224,7 +248,7 @@ export default function WorkOrdersPage() {
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Work Orders</option>
+                <option value="all">{t('all')} {t('workOrders')}</option>
                 <option value="open">{t('open')}</option>
                 <option value="in_progress">{t('inProgress')}</option>
                 <option value="on_hold">{t('onHold')}</option>
@@ -241,7 +265,7 @@ export default function WorkOrdersPage() {
                 onChange={(e) => setFilterProperty(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Properties</option>
+                <option value="all">{t('all')} {t('properties')}</option>
                 {mockProperties.map((prop) => (
                   <option key={prop.id} value={prop.id}>
                     {prop.address}
@@ -250,28 +274,69 @@ export default function WorkOrdersPage() {
               </select>
             </div>
 
-            <div className="flex items-end gap-2">
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                {t('priority')}
+              </label>
+              <select
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">{t('all')} {t('priority')}</option>
+                <option value="low">{t('low')}</option>
+                <option value="medium">{t('medium')}</option>
+                <option value="high">{t('high')}</option>
+                <option value="urgent">{t('urgent')}</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                {t('cost')}
+              </label>
+              <select
+                value={filterCost}
+                onChange={(e) => setFilterCost(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">{t('all')} {t('cost')}</option>
+                <option value="under50k">Under $50k</option>
+                <option value="50k-100k">$50k - $100k</option>
+                <option value="over100k">Over $100k</option>
+              </select>
+            </div>
+
+            <div className="flex items-end">
               <button
                 onClick={handleExportExcel}
-                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
               >
                 {t('exportToExcel')}
-              </button>
-              <button
-                onClick={handleExportCSV}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                {t('exportToCSV')}
               </button>
             </div>
           </div>
 
+          {/* Search Input */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
+              {t('search')}
+            </label>
+            <input
+              type="text"
+              placeholder="Search by control number, property, or description..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
           <p className="text-sm text-gray-600">
-            {filtered.reduce((acc, wo) => (wo.status === 'open' ? acc + 1 : acc), 0)} Open • 
+            {filtered.reduce((acc, wo) => (wo.status === 'open' ? acc + 1 : acc), 0)} {t('open')} • 
             {' '}
-            {filtered.reduce((acc, wo) => (wo.status === 'in_progress' ? acc + 1 : acc), 0)} In Progress • 
+            {filtered.reduce((acc, wo) => (wo.status === 'in_progress' ? acc + 1 : acc), 0)} {t('inProgress')} • 
             {' '}
-            {filtered.reduce((acc, wo) => (wo.status === 'completed' ? acc + 1 : acc), 0)} Completed
+            {filtered.reduce((acc, wo) => (wo.status === 'completed' ? acc + 1 : acc), 0)} {t('completed')}
           </p>
         </div>
 
@@ -354,7 +419,10 @@ export default function WorkOrdersPage() {
                                 : 'bg-green-100 text-green-800'
                             }`}
                           >
-                            {wo.status}
+                            {wo.status === 'open' && t('open')}
+                            {wo.status === 'in_progress' && t('inProgress')}
+                            {wo.status === 'on_hold' && t('onHold')}
+                            {wo.status === 'completed' && t('completed')}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm">
@@ -369,7 +437,10 @@ export default function WorkOrdersPage() {
                                 : 'bg-gray-100 text-gray-800'
                             }`}
                           >
-                            {wo.priority}
+                            {wo.priority === 'urgent' && t('urgent')}
+                            {wo.priority === 'high' && t('high')}
+                            {wo.priority === 'medium' && t('medium')}
+                            {wo.priority === 'low' && t('low')}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm font-semibold text-gray-800">${cumulative.toLocaleString()}</td>
