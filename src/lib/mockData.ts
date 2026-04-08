@@ -111,6 +111,7 @@ export interface AuditLogEntry {
   id: string;
   action: 'create' | 'update' | 'remark' | 'status_change';
   actor: string;
+  username: string;
   timestamp: string;
   entityType: 'work_order';
   entityId: string;
@@ -122,6 +123,7 @@ export interface Remark {
   id: string;
   text: string;
   author: string;
+  username: string;
   timestamp: string;
 }
 
@@ -819,12 +821,14 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'rem-001',
         text: 'Initial inspection revealed worn bearings in compressor. Approved reduced scope.',
         author: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-01-10T10:30:00Z',
       },
       {
         id: 'rem-002',
         text: 'Filter replaced, system tested and operating normally.',
         author: 'admin@poleungkuk.org.hk',
+        username: 'Admin - Ivan Suen',
         timestamp: '2026-01-25T16:45:00Z',
       },
     ],
@@ -833,6 +837,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-001',
         action: 'create',
         actor: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-01-10T09:00:00Z',
         entityType: 'work_order',
         entityId: 'wo-001',
@@ -842,6 +847,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-002',
         action: 'update',
         actor: 'admin@poleungkuk.org.hk',
+        username: 'Admin - Ivan Suen',
         timestamp: '2026-01-15T12:00:00Z',
         entityType: 'work_order',
         entityId: 'wo-001',
@@ -869,12 +875,14 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'rem-003',
         text: 'Tenant reported water leak during rainfall. Roof inspection scheduled.',
         author: 'demo@poleungkuk.org.hk',
+        username: 'Demo User - Coby Tsang',
         timestamp: '2026-02-01T14:20:00Z',
       },
       {
         id: 'rem-004',
         text: 'Contractor found multiple damaged shingles and flashing issues.',
         author: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-02-05T11:15:00Z',
       },
     ],
@@ -883,6 +891,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-003',
         action: 'create',
         actor: 'demo@poleungkuk.org.hk',
+        username: 'Demo User - Coby Tsang',
         timestamp: '2026-02-01T14:00:00Z',
         entityType: 'work_order',
         entityId: 'wo-002',
@@ -891,6 +900,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-004',
         action: 'status_change',
         actor: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-02-05T09:00:00Z',
         entityType: 'work_order',
         entityId: 'wo-002',
@@ -917,12 +927,14 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'rem-008',
         text: 'Tenant reported toilet leak. Plumber scheduled for inspection.',
         author: 'demo@poleungkuk.org.hk',
+        username: 'Demo User - Coby Tsang',
         timestamp: '2026-02-12T09:45:00Z',
       },
       {
         id: 'rem-009',
         text: 'Found internal valve failure. Approved upgrade to commercial-grade fixture.',
         author: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-02-18T13:20:00Z',
       },
     ],
@@ -931,6 +943,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-007',
         action: 'create',
         actor: 'demo@poleungkuk.org.hk',
+        username: 'Demo User - Coby Tsang',
         timestamp: '2026-02-12T09:30:00Z',
         entityType: 'work_order',
         entityId: 'wo-005',
@@ -939,6 +952,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-008',
         action: 'update',
         actor: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-02-18T13:15:00Z',
         entityType: 'work_order',
         entityId: 'wo-005',
@@ -965,12 +979,14 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'rem-011',
         text: 'Initial quote provided. Awaiting tenant approval for scope.',
         author: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-02-14T11:30:00Z',
       },
       {
         id: 'rem-012',
         text: 'Tenant on vacation. Work on hold until they return.',
         author: 'admin@poleungkuk.org.hk',
+        username: 'Admin - Ivan Suen',
         timestamp: '2026-02-17T10:00:00Z',
       },
     ],
@@ -979,6 +995,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-010',
         action: 'create',
         actor: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
         timestamp: '2026-02-14T11:15:00Z',
         entityType: 'work_order',
         entityId: 'wo-007',
@@ -1005,6 +1022,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'rem-017',
         text: 'Scheduled routine maintenance visit.',
         author: 'admin@poleungkuk.org.hk',
+        username: 'Admin - Ivan Suen',
         timestamp: '2026-02-11T08:30:00Z',
       },
     ],
@@ -1013,6 +1031,7 @@ export const mockWorkOrders: WorkOrder[] = [
         id: 'audit-013',
         action: 'create',
         actor: 'admin@poleungkuk.org.hk',
+        username: 'Admin - Ivan Suen',
         timestamp: '2026-02-11T08:15:00Z',
         entityType: 'work_order',
         entityId: 'wo-010',

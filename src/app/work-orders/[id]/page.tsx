@@ -71,22 +71,45 @@ export default function WorkOrderDetailPage() {
   const threshold = wo.financials.original + wo.financials.contingency;
   const exceedsThreshold = cumulative > threshold;
 
+  // Helper function to format username as "Role - Name"
+  const formatUsername = (userRole: string, userName: string) => {
+    const roleDisplay = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+    return `${roleDisplay} - ${userName}`;
+  };
+
   // Save remark function
   const handleSaveRemark = async () => {
     if (!newRemark.trim() || !user) return;
     
     setIsSavingRemark(true);
     try {
+      const formattedUsername = formatUsername(user.role, user.name);
+      const now = new Date().toISOString();
+      
       const remark = {
         id: `rem-${Date.now()}`,
         text: newRemark,
         author: user.email,
-        timestamp: new Date().toISOString(),
+        username: formattedUsername,
+        timestamp: now,
+      };
+      
+      // Create audit log entry for the remark
+      const auditEntry = {
+        id: `audit-${Date.now()}`,
+        action: 'remark',
+        actor: user.email,
+        username: formattedUsername,
+        timestamp: now,
+        entityType: 'work_order',
+        entityId: id,
+        description: newRemark,
       };
       
       const updatedWO = {
         ...wo,
         remarks: [...wo.remarks, remark],
+        auditLog: [...wo.auditLog, auditEntry],
       };
       
       // Save to localStorage
@@ -103,7 +126,7 @@ export default function WorkOrderDetailPage() {
       localStorage.setItem('workOrders', JSON.stringify(savedRequests));
       setNewRemark('');
       
-      // Refresh the page to show the new remark
+      // Refresh the page to show the new remark and audit log
       window.location.reload();
     } catch (error) {
       console.error('Error saving remark:', error);
@@ -128,7 +151,7 @@ export default function WorkOrderDetailPage() {
             <div>
               <h1 className="text-3xl font-bold text-gray-800">{wo.controlNumber}</h1>
               <p className="text-gray-600 mt-2">
-                {property?.address} • {wo.description}
+                {property?.address} 
               </p>
             </div>
             {(user?.role === 'admin' || user?.role === 'manager') && (
@@ -289,7 +312,7 @@ export default function WorkOrderDetailPage() {
                 {wo.remarks.map((remark) => (
                   <div key={remark.id} className="border border-gray-200 rounded p-4 bg-gray-50">
                     <div className="flex justify-between items-start mb-2">
-                      <p className="font-semibold text-gray-800">{remark.author}</p>
+                      <p className="font-semibold text-gray-800">{remark.username || remark.author}</p>
                       <p className="text-xs text-gray-600">{remark.timestamp}</p>
                     </div>
                     <p className="text-gray-700">{remark.text}</p>
@@ -302,7 +325,7 @@ export default function WorkOrderDetailPage() {
                     value={newRemark}
                     onChange={(e) => setNewRemark(e.target.value)}
                     placeholder="Add a note to this work order (append-only)..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
                     rows={3}
                   />
                   <div className="flex gap-2 mt-3">
@@ -474,24 +497,38 @@ export default function WorkOrderDetailPage() {
                         <p className="text-xs text-gray-600">{entry.timestamp}</p>
                       </div>
                       <p className="text-xs text-gray-700 mb-2">
-                        <span className="font-semibold">{t('by')}:</span> {entry.actor}
+                        <span className="font-semibold">{t('by')}:</span> {entry.username || entry.actor}
                       </p>
                       {entry.description && (
                         <p className="text-xs text-gray-600 mb-2">{entry.description}</p>
                       )}
                       {entry.changes && Object.keys(entry.changes).length > 0 && (
                         <div className="mt-3 pt-3 border-t border-gray-300 space-y-2">
-                          {Object.entries(entry.changes).map(([key, value]: [string, any], idx: number) => (
-                            <div key={idx} className="text-xs bg-white rounded p-2 border border-gray-200">
-                              <p className="font-semibold text-gray-700 capitalize">{key.replace(/\./g, ' > ')}</p>
-                              <div className="flex gap-2 mt-1">
-                                <div className="flex-1">
-                                  <p className="text-xs text-gray-600 font-semibold">Changed to:</p>
-                                  <p className="text-xs text-green-700 font-mono">{typeof value === 'object' ? JSON.stringify(value) : String(value)}</p>
+                          {Object.entries(entry.changes).map(([key, value]: [string, any], idx: number) => {
+                            // Check if value is an object with field, oldValue, newValue structure
+                            const hasChangeStructure = value && typeof value === 'object' && 'field' in value && 'oldValue' in value && 'newValue' in value;
+                            const fieldName = hasChangeStructure ? value.field : key.replace(/\./g, ' > ');
+                            const oldVal = hasChangeStructure ? value.oldValue : undefined;
+                            const newVal = hasChangeStructure ? value.newValue : value;
+                            
+                            return (
+                              <div key={idx} className="text-xs bg-white rounded p-2 border border-gray-200">
+                                <p className="font-semibold text-gray-700 capitalize">{fieldName}</p>
+                                <div className="flex gap-2 mt-1">
+                                  {oldVal !== undefined && (
+                                    <div className="flex-1">
+                                      <p className="text-xs text-gray-600 font-semibold">Before:</p>
+                                      <p className="text-xs text-red-700 font-mono">{String(oldVal)}</p>
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    <p className="text-xs text-gray-600 font-semibold">After:</p>
+                                    <p className="text-xs text-green-700 font-mono">{typeof newVal === 'object' ? JSON.stringify(newVal) : String(newVal)}</p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>

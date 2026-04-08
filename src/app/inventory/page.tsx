@@ -372,11 +372,11 @@ export default function InventoryPage() {
           {/* Search Input */}
           <div className="mb-4">
             <label className="block text-sm font-semibold text-gray-800 mb-2">
-              Search Inventory
+              {t('search')}
             </label>
             <input
               type="text"
-              placeholder="Search by brand, model, or location..."
+              placeholder={t('searchByBrandModelOrLocation')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -467,7 +467,7 @@ export default function InventoryPage() {
                       onClick={() => handleSort('quantity')}
                       className="px-6 py-3 text-left text-sm font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
                     >
-                      {t('total')} {t('quantity')}
+                      {t('quantity')}
                       {getSortIcon('quantity')}
                     </th>
                     <th 

@@ -1,5 +1,7 @@
 // i18n dictionary - English and Traditional Chinese
 
+import { Search } from "lucide-react";
+
 export type Language = 'en' | 'zh-Hant';
 
 export interface I18nDictionary {
@@ -159,6 +161,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     addNewInventoryItemToSystem: 'Add a new inventory item to your system',
     createInventoryItem: 'Create Inventory Item',
     saveChanges: 'Save Changes',
+    searchInventory: 'Search Inventory',
+    searchByBrandModelOrLocation: 'Search by brand, model, or location...',
 
     // Work Orders
     workOrder: 'Work Order',
@@ -200,6 +204,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     updated: 'Updated',
     deleted: 'Deleted',
     by: 'by',
+    relatedWorkOrders: 'Related Work Orders',
 
     // Maintenance
     trackMaintenanceRequests: 'Track and manage all maintenance requests',
@@ -497,6 +502,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     addNewInventoryItemToSystem: '新增庫存項目到系統',
     createInventoryItem: '新增庫存項目',
     saveChanges: '保存更改',
+    searchInventory: '搜尋庫存',
+    searchByBrandModelOrLocation: '按品牌、型号或位置搜索...',
 
     // Work Orders
     workOrder: '工作單',
@@ -538,6 +545,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     updated: '已更新',
     deleted: '已刪除',
     by: '由',
+    relatedWorkOrders: '相關工作單',
 
     // Maintenance
     trackMaintenanceRequests: '跟踪和管理所有維護請求',

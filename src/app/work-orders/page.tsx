@@ -461,7 +461,7 @@ export default function WorkOrdersPage() {
                             href={`/work-orders/${wo.id}`}
                             className="text-blue-600 hover:underline font-semibold"
                           >
-                            Details
+                            {t('viewDetails')}
                           </Link>
                         </td>
                       </tr>
