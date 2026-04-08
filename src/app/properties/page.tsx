@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 export default function PropertiesPage() {
   const { t } = useI18n();
@@ -80,8 +81,14 @@ export default function PropertiesPage() {
 
   // Get sort icon
   const getSortIcon = (column: string) => {
-    if (sortConfig.column !== column) return ' ↕';
-    return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+    if (sortConfig.column !== column) {
+      return <ChevronsUpDown className="w-4 h-4 text-gray-400 inline ml-1" />;
+    }
+    return sortConfig.direction === 'asc' ? (
+      <ChevronUp className="w-4 h-4 text-blue-600 inline ml-1" />
+    ) : (
+      <ChevronDown className="w-4 h-4 text-blue-600 inline ml-1" />
+    );
   };
 
   // Sort properties
@@ -93,9 +100,6 @@ export default function PropertiesPage() {
     if (column === 'address') {
       aValue = a.address;
       bValue = b.address;
-    } else if (column === 'type') {
-      aValue = a.propertyType;
-      bValue = b.propertyType;
     } else if (column === 'bedrooms') {
       aValue = a.bedrooms;
       bValue = b.bedrooms;
@@ -113,7 +117,7 @@ export default function PropertiesPage() {
 
     return direction === 'asc' ? comparison : -comparison;
   });
-  
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -256,8 +260,11 @@ export default function PropertiesPage() {
                     >
                       {t('status')}{getSortIcon('status')}
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('expiredWarranties') || 'Warranty Expiring'}</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('workOrders')}</th>
+                    <th onClick={() => handleSort('expired')}
+                    className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('expiredWarranties') || 'Warranty Expiring'}
+                      {getSortIcon('expired')}</th>
+                    <th onClick={() => handleSort('workorders')} className="px-6 py-3 text-left text-sm font-semibold text-gray-800">
+                      {t('workOrders')}{getSortIcon('workorders')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">

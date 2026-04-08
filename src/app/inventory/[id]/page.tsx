@@ -68,7 +68,7 @@ export default function InventoryDetailPage() {
               <h1 className="text-3xl font-bold text-gray-800">
                 {item.brand} {item.model}
               </h1>
-              <p className="text-gray-600 mt-2">ID: {item.id}</p>
+              <p className="text-gray-600 mt-2">Inventory #:​ {item.id}</p>
             </div>
             <div className="flex gap-2 flex-wrap">
               <span
@@ -76,9 +76,9 @@ export default function InventoryDetailPage() {
               >
                 {t(`type_${item.type}`)}
               </span>
-              <span className="inline-block px-4 py-2 rounded-lg text-sm font-semibold bg-purple-100 text-purple-800">
+              {/* <span className="inline-block px-4 py-2 rounded-lg text-sm font-semibold bg-purple-100 text-purple-800">
                 {t('total')}: {totalQuantity} unit{totalQuantity !== 1 ? 's' : ''}
-              </span>
+              </span> */}
             </div>
           </div>
         </div>

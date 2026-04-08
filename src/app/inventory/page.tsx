@@ -460,7 +460,7 @@ export default function InventoryPage() {
                           <td className="px-6 py-4 text-sm text-gray-800">{item.model}</td>
                           <td className="px-6 py-4 text-sm">
                             <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
-                              {item.type.toUpperCase()}
+                              {t(`type_${item.type}`)}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-800">
@@ -482,7 +482,7 @@ export default function InventoryPage() {
                               <span>{firstLocation.warrantyEnd}</span>
                               {isExpired && (
                                 <span className="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold">
-                                  EXPIRED
+                                  {t('expiredWarranty')}
                                 </span>
                               )}
                               {isExpiring && !isExpired && (
@@ -504,7 +504,7 @@ export default function InventoryPage() {
                                   : 'bg-red-100 text-red-800'
                               }`}
                             >
-                              {firstLocation.status}
+                              {t(firstLocation.status)}
                             </span>
                           </td>
                         </tr>

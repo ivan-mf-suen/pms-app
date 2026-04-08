@@ -20,6 +20,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     tenants: 'Tenants',
     payments: 'Payments',
 
+    // display
+    grid: 'grid',
+    list: 'list',
+
     // Common
     home: 'Home',
     logout: 'Logout',
@@ -332,6 +336,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     admin: '管理',
     tenants: '租戶',
     payments: '付款',
+
+     // display
+    grid: '格狀檢視',
+    list: '列表檢視',
 
     // Common
     home: '首頁',

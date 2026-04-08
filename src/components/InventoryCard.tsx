@@ -83,7 +83,7 @@ export default function InventoryCard({ item }: InventoryCardProps) {
               <p className="text-sm text-gray-600 truncate">{item.model}</p>
             </div>
             <span className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${typeColors[item.type] || typeColors.other}`}>
-              {typeIcons[item.type]} {t(`type_${item.type}`)}
+              {t(`type_${item.type}`)}
             </span>
           </div>
         </div>
