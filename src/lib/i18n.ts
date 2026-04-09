@@ -262,6 +262,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     deleteFile: 'Delete File',
     searchPlaceholder: 'Search by control number, property, or description...',
     workOrdersDescription: 'Track and manage all work orders with auto-generated control numbers',
+    searchMaintenancePlaceholder: 'Search by title, property, or description...',
+    year: 'Year',
 
     // Documents
     document: 'Document',
@@ -272,6 +274,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     fileType: 'File Type',
     uploadDate: 'Upload Date',
     linkedTo: 'Linked To',
+    linkToProperty: 'Link to Property (Optional)',
+    linkToMaintenance: 'Link to Maintenance Request (Optional)',
+    linkToWorkOrder: 'Link to Work Order (Optional)',
+    uploadAndManageDocuments: 'Upload and manage documents related to properties, maintenance requests, or work orders',
 
     // Reports
     reportsTitle: 'Reports',
@@ -626,7 +632,9 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     createInventoryItem: '新增庫存項目',
     saveChanges: '保存更改',
     searchInventory: '搜尋庫存',
-    searchByBrandModelOrLocation: '按品牌、型號或位置搜尋...',
+    searchByBrandModelOrLocation: '按品牌、型號或位置搜索...',
+    searchMaintenancePlaceholder: '按品牌、型號、預估成本、優先次序或描述搜索...',
+    year: '年份',
 
     // Work Orders
     workOrder: '工作單',
@@ -729,6 +737,10 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     fileType: '文件類型',
     uploadDate: '上傳日期',
     linkedTo: '關聯於',
+    linkToProperty: '連結至物業（選填）',
+    linkToMaintenance: '連結至維護請求（選填）',
+    linkToWorkOrder: '連結至工作單（選填）',
+    uploadAndManageDocuments: '上傳和管理與資產、維護請求或工作單相關的文件',
 
     // Reports
     reportsTitle: '報告',

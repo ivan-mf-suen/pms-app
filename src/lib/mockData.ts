@@ -418,6 +418,50 @@ export const mockMaintenanceRequests: MaintenanceRequest[] = [
   createdDate: '2024-03-14',
   estimatedCost: 800,
 },
+{
+    "id": "maint-006",
+    "propertyId": "prop-001",
+    "title": "空調系統檢查及濾網更換",
+    "description": "完成 HVAC 空調系統全面檢查、壓縮機軸承評估及濾網更換。",
+    "priority": "high",
+    "status": "completed",
+    "createdDate": "2026-01-10",
+    "completedDate": "2026-01-25",
+    "estimatedCost": 2200,
+    "actualCost": 2200,
+    "inventoryId": "inv-001"
+  },
+  {
+    "id": "maint-007",
+    "propertyId": "prop-001",
+    "title": "管道維修-更換損壞的馬桶",
+    "description": "發現馬桶內部閥門故障，已批准升級為商用級潔具。",
+    "priority": "medium",
+    "status": "in_progress",
+    "createdDate": "2026-02-12",
+    "estimatedCost": 1500,
+    "inventoryId": "inv-005"
+  },
+  {
+    "id": "maint-008",
+    "propertyId": "prop-002",
+    "title": "空調系統檢測-更換加濕器",
+    "description": "進行空調系統檢測及加濕器組件更換，待租戶批准。",
+    "priority": "high",
+    "status": "in_progress",
+    "createdDate": "2026-02-14",
+    "estimatedCost": 3200
+  },
+  {
+    "id": "maint-009",
+    "propertyId": "prop-001",
+    "title": "分體式空調系統檢測及濾網清潔",
+    "description": "分體式空調系統例行維護到訪，包括系統檢測及濾網清潔。",
+    "priority": "medium",
+    "status": "in_progress",
+    "createdDate": "2026-02-11",
+    "estimatedCost": 950
+  }
 ];
 
 export const mockPayments: Payment[] = [
@@ -806,6 +850,7 @@ export const mockWorkOrders: WorkOrder[] = [
     controlNumber: 'WO-2026-0001',
     propertyId: 'prop-001',
     inventoryIds: ['inv-001', 'inv-002'],
+    maintenanceRequestId: 'maint-006',
     status: 'completed',
     createdDate: '2026-01-10',
     completedDate: '2026-01-25',
@@ -913,6 +958,7 @@ export const mockWorkOrders: WorkOrder[] = [
     controlNumber: 'WO-2026-0003',
     propertyId: 'prop-001',
     inventoryIds: ['inv-005'],
+    maintenanceRequestId: 'maint-007',
     status: 'in_progress',
     createdDate: '2026-02-12',
     priority: 'medium',
@@ -965,6 +1011,7 @@ export const mockWorkOrders: WorkOrder[] = [
     controlNumber: 'WO-2026-0004',
     propertyId: 'prop-002',
     inventoryIds: ['inv-004', 'inv-012'],
+    maintenanceRequestId: 'maint-008',
     status: 'on_hold',
     createdDate: '2026-02-14',
     priority: 'high',
@@ -1008,6 +1055,7 @@ export const mockWorkOrders: WorkOrder[] = [
     controlNumber: 'WO-2026-0005',
     propertyId: 'prop-001',
     inventoryIds: ['inv-017'],
+    maintenanceRequestId: 'maint-009',
     status: 'in_progress',
     createdDate: '2026-02-11',
     priority: 'medium',
@@ -1078,6 +1126,7 @@ export const mockDocuments: Document[] = [
     name: 'Warranty_Certificates_Bundle.xlsx',
     size: 1245000,
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    maintenanceId: 'maint-006',
     uploadDate: '2026-02-01',
   },
   {

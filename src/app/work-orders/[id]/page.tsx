@@ -1,7 +1,7 @@
 'use client';
 
 import { useI18n } from '@/contexts/I18nContext';
-import { mockWorkOrders, mockInventory, mockProperties, mockMaintenanceRequests } from '@/lib/mockData';
+import { mockWorkOrders, mockInventory, mockProperties, mockMaintenanceRequests, mockDocuments } from '@/lib/mockData';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -41,6 +41,7 @@ export default function WorkOrderDetailPage() {
   const property = mockProperties.find((p) => p.id === wo.propertyId);
   const linkedInventory = mockInventory.filter((inv) => wo.inventoryIds.includes(inv.id));
   const relatedMaintenance = mockMaintenanceRequests.find((m) => m.id === wo.maintenanceRequestId);
+  const attachedDocuments = mockDocuments.filter((doc) => doc.workOrderId === wo.id);
   
   // Get work order history - same property
   const getAllWorkOrders = () => {
@@ -299,6 +300,36 @@ export default function WorkOrderDetailPage() {
                       {inv.hp && (
                         <p className="text-sm text-gray-600 mt-2">HP: {inv.hp}</p>
                       )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Attached Files */}
+            {attachedDocuments.length > 0 && (
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">{t('attachedFiles') || '附加文件'}</h2>
+                <div className="space-y-3">
+                  {attachedDocuments.map((doc) => (
+                    <div key={doc.id} className="border border-gray-200 rounded p-4 hover:border-blue-300 hover:bg-blue-50 transition">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-800">{doc.name}</p>
+                          <div className="flex gap-4 mt-2 text-sm text-gray-600">
+                            <span>{(doc.size / 1024 / 1024).toFixed(2)} MB</span>
+                            <span>{doc.type}</span>
+                            <span>{doc.uploadDate}</span>
+                          </div>
+                        </div>
+                        <a
+                          href="#"
+                          className="text-blue-600 hover:text-blue-800 font-semibold text-sm whitespace-nowrap ml-4"
+                          title="Download document"
+                        >
+                          ↓ {t('download') || '下載'}
+                        </a>
+                      </div>
                     </div>
                   ))}
                 </div>

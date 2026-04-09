@@ -14,8 +14,13 @@ export default function MaintenancePage() {
   const router = useRouter();
   const { t } = useI18n();
   const [filter, setFilter] = useState<string>('all');
+  const [filterYear, setFilterYear] = useState<string>('all');
+  const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [filterCost, setFilterCost] = useState<string>('all');
+  const [filterLocation, setFilterLocation] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [allRequests, setAllRequests] = useState(mockMaintenanceRequests);
+   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Load view mode and requests from localStorage on mount
   useEffect(() => {
@@ -52,10 +57,58 @@ export default function MaintenancePage() {
     return mockProperties.find((p) => p.id === propertyId)?.address || 'Unknown';
   };
 
-  const filtered =
-    filter === 'all'
-      ? allRequests
-      : allRequests.filter((r) => r.status === filter);
+  // Extract unique years from createdDate
+  const getYears = () => {
+    const years = new Set(allRequests.map((r) => new Date(r.createdDate).getFullYear().toString()));
+    return Array.from(years).sort().reverse();
+  };
+
+  // Extract unique locations
+  const getLocations = () => {
+    const locations = new Set(
+      allRequests.map((r) => {
+        const prop = mockProperties.find((p) => p.id === r.propertyId);
+        return prop?.address || 'Unknown';
+      })
+    );
+    return Array.from(locations).sort();
+  };
+
+  let filtered = allRequests;
+
+  // Filter by status
+  if (filter !== 'all') {
+    filtered = filtered.filter((r) => r.status === filter);
+  }
+
+  // Filter by year
+  if (filterYear !== 'all') {
+    filtered = filtered.filter((r) => new Date(r.createdDate).getFullYear().toString() === filterYear);
+  }
+
+  // Filter by priority
+  if (filterPriority !== 'all') {
+    filtered = filtered.filter((r) => r.priority === filterPriority);
+  }
+
+  // Filter by cost
+  if (filterCost !== 'all') {
+    if (filterCost === 'under1000') {
+      filtered = filtered.filter((r) => r.estimatedCost < 1000);
+    } else if (filterCost === '1000-5000') {
+      filtered = filtered.filter((r) => r.estimatedCost >= 1000 && r.estimatedCost < 5000);
+    } else if (filterCost === 'over5000') {
+      filtered = filtered.filter((r) => r.estimatedCost >= 5000);
+    }
+  }
+
+  // Filter by location
+  if (filterLocation !== 'all') {
+    filtered = filtered.filter((r) => {
+      const prop = mockProperties.find((p) => p.id === r.propertyId);
+      return prop?.address === filterLocation;
+    });
+  }
 
   const priorityColors: Record<string, string> = {
     low: 'bg-gray-100 text-gray-800',
@@ -90,7 +143,8 @@ export default function MaintenancePage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Filter */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="bg-white rounded-lg shadow p-4 mb-6 space-y-3">
+          {/* Status Filter
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setFilter('all')}
@@ -132,6 +186,87 @@ export default function MaintenancePage() {
             >
               {t('completed')} ({allRequests.filter((r) => r.status === 'completed').length})
             </button>
+          </div> */}
+
+          {/* Advanced Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Year Filter */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700 block mb-2">{t('year') || '年份'}</label>
+              <select
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              >
+                <option value="all">{t('all')}</option>
+                {getYears().map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Priority Filter */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700 block mb-2">{t('priority')}</label>
+              <select
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              >
+                <option value="all">{t('all')}</option>
+                <option value="low">{t('low')}</option>
+                <option value="medium">{t('medium')}</option>
+                <option value="high">{t('high')}</option>
+                <option value="urgent">{t('urgent')}</option>
+              </select>
+            </div>
+
+            {/* Cost Filter */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700 block mb-2">{t('estimatedCost') || '預算成本'}</label>
+              <select
+                value={filterCost}
+                onChange={(e) => setFilterCost(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              >
+                <option value="all">{t('all')}</option>
+                <option value="under1000">Under $1000</option>
+                <option value="1000-5000">$1000 - $5000</option>
+                <option value="over5000">Over $5000</option>
+              </select>
+            </div>
+
+            {/* Location Filter */}
+            <div>
+              <label className="text-sm font-semibold text-gray-700 block mb-2">{t('location') || '位置'}</label>
+              <select
+                value={filterLocation}
+                onChange={(e) => setFilterLocation(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              >
+                <option value="all">{t('all')}</option>
+                {getLocations().map((location) => (
+                  <option key={location} value={location}>
+                    {location}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          {/* Search Input */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-800 mb-2">
+              {t('search')}
+            </label>
+            <input
+              type="text"
+              placeholder={t('searchMaintenancePlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
         </div>
 

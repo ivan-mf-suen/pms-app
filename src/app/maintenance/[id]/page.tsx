@@ -1,6 +1,6 @@
 'use client';
 
-import { mockMaintenanceRequests, mockProperties, mockInventory, MaintenanceRequest } from '@/lib/mockData';
+import { mockMaintenanceRequests, mockProperties, mockInventory, mockDocuments, MaintenanceRequest } from '@/lib/mockData';
 import MaintenanceEditModal from '@/components/MaintenanceEditModal';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -8,7 +8,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
-import { Download, X } from 'lucide-react';
+import { Download, Trash2, X } from 'lucide-react';
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString + 'T00:00:00');
@@ -48,6 +48,51 @@ export default function MaintenanceDetailPage() {
     setRequest(maintenanceRequest || null);
     setIsLoading(false);
   }, [id]);
+  
+  // Helper to get documents linked to this maintenance request
+  const getLinkedDocuments = () => {
+    if (typeof window === 'undefined') {
+      return mockDocuments.filter((doc) => doc.maintenanceId === id);
+    }
+    
+    // Get documents from localStorage
+    const savedDocs = localStorage.getItem('documents');
+    const localDocs = savedDocs ? JSON.parse(savedDocs) : [];
+    
+    // Merge with mock data
+    const allDocs = [...mockDocuments];
+    localDocs.forEach((doc: any) => {
+      const index = allDocs.findIndex(d => d.id === doc.id);
+      if (index >= 0) {
+        allDocs[index] = doc;
+      } else {
+        allDocs.push(doc);
+      }
+    });
+    
+    // Filter by this maintenance ID
+    return allDocs.filter((doc) => doc.maintenanceId === id);
+  };
+  
+  const handleDeleteDocument = (docId: string) => {
+    if (typeof window === 'undefined') return;
+    const savedDocs = localStorage.getItem('documents');
+    let allDocs = savedDocs ? JSON.parse(savedDocs) : [];
+    allDocs = allDocs.filter((doc: any) => doc.id !== docId);
+    localStorage.setItem('documents', JSON.stringify(allDocs));
+    // Reload to show updated list
+    window.location.reload();
+  };
+  
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+  };
+  
+  const linkedDocuments = getLinkedDocuments();
   const property = request ? mockProperties.find((p) => p.id === request.propertyId) : null;
   const linkedInventory = request && request.inventoryId ? mockInventory.find((inv) => inv.id === request.inventoryId) : null;
 
@@ -366,26 +411,35 @@ export default function MaintenanceDetailPage() {
           {/* Attached Files */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-bold text-gray-800 mb-4">{t('attachedFiles')}</h2>
-            {request && (request as any).attachedFiles && (request as any).attachedFiles.length > 0 ? (
+            {linkedDocuments && linkedDocuments.length > 0 ? (
               <div className="space-y-2">
-                {(request as any).attachedFiles.map((file: any) => (
+                {linkedDocuments.map((doc: any) => (
                   <div
-                    key={file.id}
-                    className="flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                    key={doc.id}
+                    className="flex justify-between items-center p-3 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition"
                   >
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-800">{file.name}</p>
+                      <p className="text-sm font-semibold text-gray-800">{doc.name}</p>
                       <p className="text-xs text-gray-600">
-                        {(file.size / 1024).toFixed(2)} KB • {new Date(file.uploadDate).toLocaleDateString()}
+                        {formatFileSize(doc.size)} • {new Date(doc.uploadDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <button
-                      onClick={() => handleDownloadFile(file)}
-                      className="ml-2 p-2 text-blue-600 hover:bg-blue-50 rounded transition"
-                      title={t('download')}
-                    >
-                      <Download size={18} />
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDownloadFile(doc)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded transition"
+                        title={t('download')}
+                      >
+                        <Download size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteDocument(doc.id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded transition"
+                        title={t('delete')}
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

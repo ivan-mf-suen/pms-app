@@ -2,9 +2,9 @@
 
 import { useI18n } from '@/contexts/I18nContext';
 import { mockDocuments, mockProperties, mockMaintenanceRequests, mockWorkOrders } from '@/lib/mockData';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Download, Trash2 } from 'lucide-react';
+import { Download, Trash2, Camera } from 'lucide-react';
 
 export default function DocumentsPage() {
   const { t } = useI18n();
@@ -13,6 +13,7 @@ export default function DocumentsPage() {
   const [selectedProperty, setSelectedProperty] = useState('');
   const [selectedMaintenance, setSelectedMaintenance] = useState('');
   const [selectedWorkOrder, setSelectedWorkOrder] = useState('');
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch maintenance requests from both mockData and localStorage
   const getAllMaintenanceRequests = () => {
@@ -142,8 +143,8 @@ export default function DocumentsPage() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-gray-800">{t('documents')}</h1>
-          <p className="text-gray-600 mt-1">Upload and manage documents for properties and work orders</p>
-          <p className="text-xs text-gray-500 mt-2">// TODO: antivirus scan for production deployment</p>
+          <p className="text-gray-600 mt-1">{t('uploadAndManageDocuments')}</p>
+          {/* <p className="text-xs text-gray-500 mt-2">// TODO: antivirus scan for production deployment</p> */}
         </div>
       </div>
 
@@ -154,19 +155,36 @@ export default function DocumentsPage() {
           <h2 className="text-lg font-bold text-gray-800 mb-4">{t('uploadDocument')}</h2>
           <div className="space-y-4">
             <div className="border-2 border-dashed border-blue-300 rounded-lg p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <input
+                  type="file"
+                  onChange={handleFileSelect}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                />
+                <button
+                  onClick={() => cameraInputRef.current?.click()}
+                  title="Take a photo"
+                  className="flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  <Camera size={20} />
+                </button>
+              </div>
               <input
+                ref={cameraInputRef}
                 type="file"
+                accept="image/*,video/*"
+                capture="environment"
                 onChange={handleFileSelect}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                className="hidden"
               />
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-gray-600">
                 Supported formats: PDF, DOCX, XLSX, JPG, PNG, and other common document types
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Link to Property (Optional)</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">{t('linkToProperty')}</label>
                 <select
                   value={selectedProperty}
                   onChange={(e) => setSelectedProperty(e.target.value)}
@@ -182,7 +200,7 @@ export default function DocumentsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Link to Maintenance Request (Optional)</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">{t('linkToMaintenance')}</label>
                 <select
                   value={selectedMaintenance}
                   onChange={(e) => setSelectedMaintenance(e.target.value)}
@@ -198,7 +216,7 @@ export default function DocumentsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Link to Work Order (Optional)</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">{t('linkToWorkOrder')}</label>
                 <select
                   value={selectedWorkOrder}
                   onChange={(e) => setSelectedWorkOrder(e.target.value)}
