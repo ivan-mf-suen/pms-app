@@ -68,6 +68,20 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     yes: 'Yes',
     no: 'No',
 
+    // Calendar
+    dayNameSun: 'Sun',
+    dayNameMon: 'Mon',
+    dayNameTue: 'Tue',
+    dayNameWed: 'Wed',
+    dayNameThu: 'Thu',
+    dayNameFri: 'Fri',
+    dayNameSat: 'Sat',
+    previousMonth: 'Previous month',
+    nextMonth: 'Next month',
+    calendarExpired: 'expired',
+    calendarExpiring: 'expiring',
+    calendarWorkOrder: 'WO',
+
     // Properties
     allProperties: 'All Properties',
     propertyFilter_allAssets: 'All Assets',
@@ -530,9 +544,25 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     showing: '顯示',
     actionRequired: '需要操作',
     id: '編號',
-    rentalAgreementExpired: '租約將在3個月內到期',    type: '類型',
+    rentalAgreementExpired: '租約將在3個月內到期',
+    type: '類型',
     yes: '是',
     no: '否',
+
+    // Calendar
+    dayNameSun: '星期日',
+    dayNameMon: '星期一',
+    dayNameTue: '星期二',
+    dayNameWed: '星期三',
+    dayNameThu: '星期四',
+    dayNameFri: '星期五',
+    dayNameSat: '星期六',
+    previousMonth: '上一個月',
+    nextMonth: '下一個月',
+    calendarExpired: '已過期',
+    calendarExpiring: '即將到期',
+    calendarWorkOrder: '工作單',
+
     // Properties
     allProperties: '所有資產',
     propertyFilter_allAssets: '所有資產',

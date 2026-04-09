@@ -4,12 +4,122 @@ import { useI18n } from '@/contexts/I18nContext';
 import { mockWorkOrders, mockProperties, mockInventory, mockPayments } from '@/lib/mockData';
 import { exportToExcel, ExportColumn } from '@/lib/exportUtils';
 import { useState } from 'react';
+import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
 export default function ReportsPage() {
   const { t } = useI18n();
   const [activeReport, setActiveReport] = useState<'progress' | 'funding' | 'status' | 'condition' | 'inventory'>(
     'progress'
   );
+
+  // Sorting state for all reports
+  const [sortConfig, setSortConfig] = useState<{ [key: string]: { column: string; direction: 'asc' | 'desc' } }>({
+    progress: { column: 'createdDate', direction: 'desc' },
+    funding: { column: 'controlNumber', direction: 'asc' },
+    status: { column: 'controlNumber', direction: 'asc' },
+    condition: { column: 'address', direction: 'asc' },
+    inventory: { column: 'brand', direction: 'asc' },
+  });
+
+  // Color schemes for status and priority
+  const workOrderStatusColors: Record<string, string> = {
+    open: 'bg-gray-100 text-gray-800',
+    in_progress: 'bg-blue-100 text-blue-800',
+    completed: 'bg-green-100 text-green-800',
+    on_hold: 'bg-yellow-100 text-yellow-800',
+  };
+
+  const priorityColors: Record<string, string> = {
+    low: 'bg-gray-100 text-gray-800',
+    medium: 'bg-yellow-100 text-yellow-800',
+    high: 'bg-orange-100 text-orange-800',
+    urgent: 'bg-red-100 text-red-800',
+  };
+
+  const propertyStatusColors: Record<string, string> = {
+    occupied: 'bg-green-100 text-green-800',
+    available: 'bg-blue-100 text-blue-800',
+    maintenance: 'bg-yellow-100 text-yellow-800',
+    vacant: 'bg-red-100 text-red-800',
+  };
+
+  const inventoryStatusColors: Record<string, string> = {
+    active: 'bg-green-100 text-green-800',
+    inactive: 'bg-gray-100 text-gray-800',
+    retired: 'bg-red-100 text-red-800',
+  };
+
+  // Sorting helper functions
+  const handleSort = (reportType: string, column: string) => {
+    setSortConfig((prev) => ({
+      ...prev,
+      [reportType]: {
+        column,
+        direction: prev[reportType]?.column === column && prev[reportType]?.direction === 'asc' ? 'desc' : 'asc',
+      },
+    }));
+  };
+
+  const getSortIcon = (reportType: string, column: string) => {
+    const config = sortConfig[reportType];
+    if (config?.column !== column) {
+      return <ChevronsUpDown className="w-4 h-4 text-gray-400 inline ml-1" />;
+    }
+    return config?.direction === 'asc' ? (
+      <ChevronUp className="w-4 h-4 text-blue-600 inline ml-1" />
+    ) : (
+      <ChevronDown className="w-4 h-4 text-blue-600 inline ml-1" />
+    );
+  };
+
+  // Helper function to sort data
+  const getSortedData = (data: any[], reportType: string, columns: string[]) => {
+    if (!data || data.length === 0) return data;
+    const config = sortConfig[reportType];
+    if (!config) return data;
+
+    const sorted = [...data].sort((a, b) => {
+      let aValue = a[config.column];
+      let bValue = b[config.column];
+
+      if (aValue === undefined || aValue === null) aValue = '';
+      if (bValue === undefined || bValue === null) bValue = '';
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+        return config.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return config.direction === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+
+      if (aValue instanceof Date && bValue instanceof Date) {
+        return config.direction === 'asc'
+          ? aValue.getTime() - bValue.getTime()
+          : bValue.getTime() - aValue.getTime();
+      }
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        const dateA = new Date(aValue);
+        const dateB = new Date(bValue);
+        if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+          return config.direction === 'asc'
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime();
+        }
+      }
+
+      return config.direction === 'asc'
+        ? String(aValue).localeCompare(String(bValue))
+        : String(bValue).localeCompare(String(aValue));
+    });
+
+    return sorted;
+  };
 
   // ==================== DATA CALCULATIONS ====================
 
@@ -275,20 +385,54 @@ export default function ReportsPage() {
             {/* Details Table */}
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-gray-100 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('controlNumber')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('status')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('priority')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('createdDate')}</th>
+                    <th 
+                      onClick={() => handleSort('progress', 'controlNumber')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('controlNumber')} {getSortIcon('progress', 'controlNumber')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('progress', 'status')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('status')} {getSortIcon('progress', 'status')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('progress', 'priority')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('priority')} {getSortIcon('progress', 'priority')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('progress', 'createdDate')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('createdDate')} {getSortIcon('progress', 'createdDate')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {mockWorkOrders.slice(0, 10).map((wo: any) => (
+                  {getSortedData(mockWorkOrders, 'progress', ['controlNumber', 'status', 'priority', 'createdDate']).slice(0, 10).map((wo: any) => (
                     <tr key={wo.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/work-orders/${wo.id}`}>
                       <td className="px-6 py-4 font-semibold text-blue-600">{wo.controlNumber}</td>
-                      <td className="px-6 py-4 capitalize text-gray-700">{wo.status}</td>
-                      <td className="px-6 py-4 capitalize text-gray-700">{wo.priority}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${workOrderStatusColors[wo.status]}`}>
+                          {wo.status === 'open' && t('open')}
+                          {wo.status === 'in_progress' && t('inProgress')}
+                          {wo.status === 'completed' && t('completed')}
+                          {wo.status === 'on_hold' && t('onHold')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${priorityColors[wo.priority]}`}>
+                          {wo.priority === 'low' && t('low')}
+                          {wo.priority === 'medium' && t('medium')}
+                          {wo.priority === 'high' && t('high')}
+                          {wo.priority === 'urgent' && t('urgent')}
+                        </span>
+                      </td>
                       <td className="px-6 py-4 text-gray-700">{wo.createdDate}</td>
                     </tr>
                   ))}
@@ -339,16 +483,45 @@ export default function ReportsPage() {
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-gray-100 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('controlNumber')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('originalBudget')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('cumulativeSpending')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('exceededThreshold')}</th>
+                    <th 
+                      onClick={() => handleSort('funding', 'controlNumber')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('controlNumber')} {getSortIcon('funding', 'controlNumber')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('funding', 'original')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('originalBudget')} {getSortIcon('funding', 'original')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('funding', 'cumulative')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('cumulativeSpending')} {getSortIcon('funding', 'cumulative')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('funding', 'threshold')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('exceededThreshold')} {getSortIcon('funding', 'threshold')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {mockWorkOrders.slice(0, 10).map((wo: any) => {
+                  {getSortedData(
+                    mockWorkOrders.map((wo: any) => ({
+                      ...wo,
+                      original: wo.financials.original,
+                      cumulative: wo.financials.original + wo.financials.voApproved + wo.financials.contingency,
+                      threshold: wo.financials.original + wo.financials.contingency,
+                    })),
+                    'funding',
+                    ['controlNumber', 'original', 'cumulative', 'threshold']
+                  ).slice(0, 10).map((wo: any) => {
                     const cumulative = wo.financials.original + wo.financials.voApproved + wo.financials.contingency;
                     const threshold = wo.financials.original + wo.financials.contingency;
                     return (
@@ -410,19 +583,46 @@ export default function ReportsPage() {
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-gray-100 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('controlNumber')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('status')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('createdDate')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('completedDate')}</th>
+                    <th 
+                      onClick={() => handleSort('status', 'controlNumber')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('controlNumber')} {getSortIcon('status', 'controlNumber')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('status', 'status')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('status')} {getSortIcon('status', 'status')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('status', 'createdDate')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('createdDate')} {getSortIcon('status', 'createdDate')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('status', 'completedDate')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('completedDate')} {getSortIcon('status', 'completedDate')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {mockWorkOrders.slice(0, 10).map((wo: any) => (
+                  {getSortedData(mockWorkOrders, 'status', ['controlNumber', 'status', 'createdDate', 'completedDate']).slice(0, 10).map((wo: any) => (
                     <tr key={wo.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-blue-600">{wo.controlNumber}</td>
-                      <td className="px-6 py-4 capitalize">{wo.status}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${workOrderStatusColors[wo.status]}`}>
+                          {wo.status === 'open' && t('open')}
+                          {wo.status === 'in_progress' && t('inProgress')}
+                          {wo.status === 'completed' && t('completed')}
+                          {wo.status === 'on_hold' && t('onHold')}
+                        </span>
+                      </td>
                       <td className="px-6 py-4">{wo.createdDate}</td>
                       <td className="px-6 py-4">{wo.completedDate || t('noData')}</td>
                     </tr>
@@ -476,20 +676,54 @@ export default function ReportsPage() {
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-gray-100 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('address')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('type')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('status')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('currentValue')}</th>
+                    <th 
+                      onClick={() => handleSort('condition', 'address')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('address')} {getSortIcon('condition', 'address')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('condition', 'type')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('type')} {getSortIcon('condition', 'type')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('condition', 'status')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('status')} {getSortIcon('condition', 'status')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('condition', 'value')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('currentValue')} {getSortIcon('condition', 'value')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {mockProperties.slice(0, 10).map((prop: any) => (
+                  {getSortedData(
+                    mockProperties.map(prop => ({
+                      ...prop,
+                      value: prop.currentValue
+                    })),
+                    'condition',
+                    ['address', 'type', 'status', 'value']
+                  ).slice(0, 10).map((prop: any) => (
                     <tr key={prop.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-gray-800">{prop.address}</td>
                       <td className="px-6 py-4 capitalize">{prop.type}</td>
-                      <td className="px-6 py-4 capitalize">{prop.status}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${propertyStatusColors[prop.status]}`}>
+                          {prop.status === 'occupied' && t('occupied')}
+                          {prop.status === 'available' && t('available')}
+                          {prop.status === 'maintenance' && t('maintenance')}
+                          {prop.status === 'vacant' && t('vacant')}
+                        </span>
+                      </td>
                       <td className="px-6 py-4">${prop.currentValue.toLocaleString()}</td>
                     </tr>
                   ))}
@@ -555,27 +789,70 @@ export default function ReportsPage() {
 
             <div className="bg-white rounded-lg shadow overflow-hidden">
               <table className="w-full">
-                <thead className="bg-gray-100">
+                <thead className="bg-gray-100 border-b">
                   <tr>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('brand')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('model')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('type')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('status')}</th>
-                    <th className="px-6 py-3 text-left font-semibold text-gray-800">{t('warrantyEnd')}</th>
+                    <th 
+                      onClick={() => handleSort('inventory', 'brand')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('brand')} {getSortIcon('inventory', 'brand')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('inventory', 'model')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('model')} {getSortIcon('inventory', 'model')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('inventory', 'type')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('type')} {getSortIcon('inventory', 'type')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('inventory', 'status')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('status')} {getSortIcon('inventory', 'status')}
+                    </th>
+                    <th 
+                      onClick={() => handleSort('inventory', 'warranty')}
+                      className="px-6 py-3 text-left font-semibold text-gray-800 cursor-pointer hover:bg-gray-200 transition"
+                    >
+                      {t('warrantyEnd')} {getSortIcon('inventory', 'warranty')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {mockInventory.slice(0, 10).flatMap((item: any) =>
-                    item.locations.slice(0, 1).map((loc: any, idx: number) => (
-                      <tr key={`${item.id}-${idx}`} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 font-semibold text-gray-800">{item.brand}</td>
-                        <td className="px-6 py-4">{item.model}</td>
-                        <td className="px-6 py-4 capitalize">{item.type}</td>
-                        <td className="px-6 py-4 capitalize">{loc.status}</td>
-                        <td className="px-6 py-4">{loc.warrantyEnd}</td>
-                      </tr>
-                    ))
-                  )}
+                  {getSortedData(
+                    mockInventory.flatMap((item: any, idx: number) =>
+                      item.locations.slice(0, 1).map((loc: any, locIdx: number) => ({
+                        id: `${item.id}-${locIdx}`,
+                        itemId: item.id,
+                        brand: item.brand,
+                        model: item.model,
+                        type: item.type,
+                        status: loc.status,
+                        warranty: loc.warrantyEnd,
+                      }))
+                    ),
+                    'inventory',
+                    ['brand', 'model', 'type', 'status', 'warranty']
+                  ).slice(0, 10).map((row: any) => (
+                    <tr key={row.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-semibold text-gray-800">{row.brand}</td>
+                      <td className="px-6 py-4">{row.model}</td>
+                      <td className="px-6 py-4 capitalize">{row.type}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${inventoryStatusColors[row.status]}`}>
+                          {row.status === 'active' && t('active')}
+                          {row.status === 'inactive' && t('inactive')}
+                          {row.status === 'retired' && t('retired')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">{row.warranty}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

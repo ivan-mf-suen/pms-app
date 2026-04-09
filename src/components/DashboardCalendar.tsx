@@ -7,12 +7,14 @@ import {
   DayEvents,
 } from '@/lib/calendarUtils';
 import CalendarEventPopover from './CalendarEventPopover';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface DashboardCalendarProps {
   events: Record<string, DayEvents & { colors: ('red' | 'yellow' | 'blue')[] }>;
 }
 
 export default function DashboardCalendar({ events }: DashboardCalendarProps) {
+  const { t } = useI18n();
   const now = new Date();
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(now.getMonth());
@@ -45,7 +47,15 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
     year: 'numeric',
   });
 
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dayNames = [
+    t('dayNameSun'),
+    t('dayNameMon'),
+    t('dayNameTue'),
+    t('dayNameWed'),
+    t('dayNameThu'),
+    t('dayNameFri'),
+    t('dayNameSat'),
+  ];
 
   const getPriorityColor = (colors: ('red' | 'yellow' | 'blue')[]): string => {
     if (colors.includes('red')) return 'bg-red-500 text-white';
@@ -71,13 +81,13 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
 
     const parts: string[] = [];
     if (dayEvent.inventoryExpired.length > 0) {
-      parts.push(`${dayEvent.inventoryExpired.length} expired`);
+      parts.push(`${dayEvent.inventoryExpired.length} ${t('calendarExpired')}`);
     }
     if (dayEvent.inventoryNearlyExpired.length > 0) {
-      parts.push(`${dayEvent.inventoryNearlyExpired.length} expiring`);
+      parts.push(`${dayEvent.inventoryNearlyExpired.length} ${t('calendarExpiring')}`);
     }
     if (dayEvent.workOrders.length > 0) {
-      parts.push(`${dayEvent.workOrders.length} WO`);
+      parts.push(`${dayEvent.workOrders.length} ${t('calendarWorkOrder')}`);
     }
 
     return parts.length > 0 ? parts.join(', ') : null;
@@ -106,7 +116,7 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
           <button
             onClick={goToPreviousMonth}
             className="p-1 hover:bg-gray-200 rounded text-sm transition-colors"
-            aria-label="Previous month"
+            aria-label={t('previousMonth')}
           >
             ←
           </button>
@@ -114,7 +124,7 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
           <button
             onClick={goToNextMonth}
             className="p-1 hover:bg-gray-200 rounded text-sm transition-colors"
-            aria-label="Next month"
+            aria-label={t('nextMonth')}
           >
             →
           </button>
