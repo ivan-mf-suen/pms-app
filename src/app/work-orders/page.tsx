@@ -208,7 +208,7 @@ export default function WorkOrdersPage() {
         <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{t('workOrders')}</h1>
-            <p className="text-gray-600 mt-1">Track and manage all work orders with auto-generated control numbers</p>
+            <p className="text-gray-600 mt-1">{t('workOrdersDescription')}</p>
           </div>
           {(user?.role === 'admin' || user?.role === 'manager') && (
             <Link
@@ -324,7 +324,7 @@ export default function WorkOrdersPage() {
             </label>
             <input
               type="text"
-              placeholder="Search by control number, property, or description..."
+              placeholder={t('searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

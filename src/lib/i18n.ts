@@ -237,6 +237,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     createdFromMaintenance: 'Created from Maintenance',
     linkedWorkOrder: 'Linked Work Order',
     estimatedCost: 'Est. Cost',
+    cost: 'Cost',
     actualCost: 'Actual Cost',
     noMaintenanceRequests: 'No maintenance requests found',
     backToMaintenance: 'Back to Maintenance',
@@ -259,6 +260,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     uploadFiles: 'Upload Files',
     noFilesAttached: 'No files attached',
     deleteFile: 'Delete File',
+    searchPlaceholder: 'Search by control number, property, or description...',
+    workOrdersDescription: 'Track and manage all work orders with auto-generated control numbers',
 
     // Documents
     document: 'Document',
@@ -623,7 +626,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     createInventoryItem: '新增庫存項目',
     saveChanges: '保存更改',
     searchInventory: '搜尋庫存',
-    searchByBrandModelOrLocation: '按品牌、型号或位置搜索...',
+    searchByBrandModelOrLocation: '按品牌、型號或位置搜尋...',
 
     // Work Orders
     workOrder: '工作單',
@@ -666,6 +669,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     deleted: '已刪除',
     by: '由',
     relatedWorkOrders: '相關工作單',
+    searchPlaceholder: '按控制編號、資產或描述搜索...',
+    workOrdersDescription: '追蹤和管理所有工作單，自動產生控制編號',
 
     // Maintenance
     trackMaintenanceRequests: '跟踪和管理所有維護請求',
@@ -691,6 +696,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     createdFromMaintenance: '由維護請求建立',
     linkedWorkOrder: '關聯工作單',
     estimatedCost: '預估成本',
+    cost: '成本',
     actualCost: '實際成本',
     noMaintenanceRequests: '未找到維護請求',
     backToMaintenance: '返回維護',
