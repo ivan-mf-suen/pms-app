@@ -318,18 +318,18 @@ export default function InventoryPage() {
 
             <div>
               <label className="block text-sm font-semibold text-gray-800 mb-2">
-                Property Type
+                {t('propertyType')}
               </label>
               <select
                 value={filterPropertyType}
                 onChange={(e) => setFilterPropertyType(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="all">All Types</option>
-                <option value="kindergarten">Kindergarten</option>
-                <option value="primarysecondaryschool">Primary/Secondary School</option>
-                <option value="secondaryschool">Secondary School</option>
-                <option value="internationalschool">International School</option>
+                <option value="all">{t('all')} {t('propertyType')}</option>
+                <option value="kindergarten">{t('propertyType_kindergarten')}</option>
+                <option value="primarysecondaryschool">{t('propertyType_primarysecondaryschool')}</option>
+                <option value="secondaryschool">{t('propertyType_secondaryschool')}</option>
+                <option value="internationalschool">{t('propertyType_internationalschool')}</option>
               </select>
             </div>
 

@@ -308,9 +308,9 @@ export default function MaintenancePage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">{t('all')}</option>
-                <option value="under1000">Under $1000</option>
-                <option value="1000-5000">$1000 - $5000</option>
-                <option value="over5000">Over $5000</option>
+                <option value="under1000">{t('cost_under1000')}</option>
+                <option value="1000-5000">{t('cost_1000_5000')}</option>
+                <option value="over5000">{t('cost_over5000')}</option>
               </select>
             </div>
 

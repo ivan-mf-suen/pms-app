@@ -527,9 +527,9 @@ export default function ReportsPage() {
                     return (
                       <tr key={wo.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => window.location.href = `/work-orders/${wo.id}`}>
                         <td className="px-6 py-4 font-semibold text-blue-600">{wo.controlNumber}</td>
-                        <td className="px-6 py-4">${wo.financials.original.toLocaleString()}</td>
-                        <td className="px-6 py-4 font-semibold">${cumulative.toLocaleString()}</td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 text-gray-700">${wo.financials.original.toLocaleString()}</td>
+                        <td className="px-6 py-4 font-semibold text-gray-700">${cumulative.toLocaleString()}</td>
+                        <td className="px-6 py-4 text-gray-700">
                           <span
                             className={`px-2 py-1 rounded text-xs font-semibold ${
                               cumulative > threshold
@@ -615,7 +615,7 @@ export default function ReportsPage() {
                   {getSortedData(mockWorkOrders, 'status', ['controlNumber', 'status', 'createdDate', 'completedDate']).slice(0, 10).map((wo: any) => (
                     <tr key={wo.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-blue-600">{wo.controlNumber}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 text-gray-700"> 
                         <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${workOrderStatusColors[wo.status]}`}>
                           {wo.status === 'open' && t('open')}
                           {wo.status === 'in_progress' && t('inProgress')}
@@ -623,8 +623,8 @@ export default function ReportsPage() {
                           {wo.status === 'on_hold' && t('onHold')}
                         </span>
                       </td>
-                      <td className="px-6 py-4">{wo.createdDate}</td>
-                      <td className="px-6 py-4">{wo.completedDate || t('noData')}</td>
+                      <td className="px-6 py-4 text-gray-700">{wo.createdDate}</td>
+                      <td className="px-6 py-4 text-gray-700">{wo.completedDate || t('noData')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -715,8 +715,8 @@ export default function ReportsPage() {
                   ).slice(0, 10).map((prop: any) => (
                     <tr key={prop.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-gray-800">{prop.address}</td>
-                      <td className="px-6 py-4 capitalize">{prop.type}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 capitalize text-gray-700">{prop.type}</td>
+                      <td className="px-6 py-4 text-gray-700">
                         <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${propertyStatusColors[prop.status]}`}>
                           {prop.status === 'occupied' && t('occupied')}
                           {prop.status === 'available' && t('available')}
@@ -724,7 +724,7 @@ export default function ReportsPage() {
                           {prop.status === 'vacant' && t('vacant')}
                         </span>
                       </td>
-                      <td className="px-6 py-4">${prop.currentValue.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-gray-700">${prop.currentValue.toLocaleString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -841,16 +841,16 @@ export default function ReportsPage() {
                   ).slice(0, 10).map((row: any) => (
                     <tr key={row.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-gray-800">{row.brand}</td>
-                      <td className="px-6 py-4">{row.model}</td>
-                      <td className="px-6 py-4 capitalize">{row.type}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 text-gray-700">{row.model}</td>
+                      <td className="px-6 py-4 capitalize text-gray-700">{row.type}</td>
+                      <td className="px-6 py-4 text-gray-700" >
                         <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${inventoryStatusColors[row.status]}`}>
                           {row.status === 'active' && t('active')}
                           {row.status === 'inactive' && t('inactive')}
                           {row.status === 'retired' && t('retired')}
                         </span>
                       </td>
-                      <td className="px-6 py-4">{row.warranty}</td>
+                      <td className="px-6 py-4 text-gray-700">{row.warranty}</td>
                     </tr>
                   ))}
                 </tbody>

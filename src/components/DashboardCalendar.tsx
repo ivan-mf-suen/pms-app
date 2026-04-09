@@ -42,10 +42,22 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
-  const monthName = new Date(currentYear, currentMonth).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
+  const monthNames = [
+    t('monthName_january'),
+    t('monthName_february'),
+    t('monthName_march'),
+    t('monthName_april'),
+    t('monthName_may'),
+    t('monthName_june'),
+    t('monthName_july'),
+    t('monthName_august'),
+    t('monthName_september'),
+    t('monthName_october'),
+    t('monthName_november'),
+    t('monthName_december'),
+  ];
+
+  const monthName = `${monthNames[currentMonth]} ${currentYear}`;
 
   const dayNames = [
     t('dayNameSun'),
@@ -212,19 +224,19 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
       <div className="border-t border-gray-200 pt-3">
         {/* Legend */}
         <div className="mb-3">
-          <div className="text-xs text-gray-600 font-semibold mb-2">Legend:</div>
+          <div className="text-xs text-gray-600 font-semibold mb-2">{t('Legend')}:</div>
           <div className="flex gap-3 flex-wrap text-xs">
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-red-500" />
-              <span className="text-gray-600">Expired</span>
+              <span className="text-gray-600">{t('Expired')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-yellow-400" />
-              <span className="text-gray-600">Expiring Soon</span>
+              <span className="text-gray-600">{t('ExpiringSoon')}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full bg-blue-500" />
-              <span className="text-gray-600">Work Orders</span>
+              <span className="text-gray-600">{t('WorkOrders')}</span>
             </div>
           </div>
         </div>
@@ -232,7 +244,7 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
         {/* Upcoming Events Summary */}
         {upcomingEvents.length > 0 && (
           <div className="bg-gray-50 rounded p-2.5 border border-gray-200">
-            <div className="text-xs font-semibold text-gray-700 mb-2">📅 Upcoming Events:</div>
+            <div className="text-xs font-semibold text-gray-700 mb-2">📅 {t('UpcomingEvents')}</div>
             <div className="space-y-1.5">
               {upcomingEvents.map(([date, dayEvent]) => {
                 const eventDate = new Date(date);
@@ -254,17 +266,17 @@ export default function DashboardCalendar({ events }: DashboardCalendarProps) {
                     <span className="font-semibold text-gray-800">{dateDisplay}</span>
                     {dayEvent.inventoryExpired.length > 0 && (
                       <span className="inline-block ml-2 px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium">
-                        {dayEvent.inventoryExpired.length} expired
+                        {dayEvent.inventoryExpired.length} {t('Expired')}
                       </span>
                     )}
                     {dayEvent.inventoryNearlyExpired.length > 0 && (
                       <span className="inline-block ml-1 px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs font-medium">
-                        {dayEvent.inventoryNearlyExpired.length} soon
+                        {dayEvent.inventoryNearlyExpired.length} {t('ExpiringSoon')}
                       </span>
                     )}
                     {dayEvent.workOrders.length > 0 && (
                       <span className="inline-block ml-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
-                        {dayEvent.workOrders.length} WO
+                        {dayEvent.workOrders.length} {t('WorkOrders')}
                       </span>
                     )}
                   </div>
