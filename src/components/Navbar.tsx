@@ -28,12 +28,13 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-slate-800 text-white shadow-lg">
+    <nav className="sticky top-0 z-50 bg-slate-500 text-white shadow-lg">
       <div className="max-w-[88rem] mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link href="/" className="font-bold text-xl">
-              🏠 PMS Prototype
+              <img src="/plk_logo.svg" alt="PMS Logo" className="h-12 mr-4 inline-block" />
+              <span className="text-base">{t('pms_phototype')}</span>
             </Link>
             {/* Desktop Menu */}
             <div className="hidden md:flex gap-6">
@@ -134,63 +135,56 @@ export default function Navbar() {
           <div className="md:hidden mt-4 space-y-2 pb-4">
             <Link
               href="/"
-              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                isActive('/') ? 'bg-blue-600 text-blue-100' : ''
-              }`}
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t('dashboard')}
             </Link>
             <Link
               href="/properties"
-              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                isActive('/properties') ? 'bg-blue-600 text-blue-100' : ''
-              }`}
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/properties') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t('properties')}
             </Link>
             <Link
               href="/inventory"
-              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                isActive('/inventory') ? 'bg-blue-600 text-blue-100' : ''
-              }`}
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/inventory') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t('inventory')}
             </Link>
             <Link
               href="/maintenance"
-              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                isActive('/maintenance') ? 'bg-blue-600 text-blue-100' : ''
-              }`}
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/maintenance') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t('maintenance')}
             </Link>
             <Link
               href="/work-orders"
-              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                isActive('/work-orders') ? 'bg-blue-600 text-blue-100' : ''
-              }`}
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/work-orders') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t('workOrders')}
             </Link>
             <Link
               href="/documents"
-              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                isActive('/documents') ? 'bg-blue-600 text-blue-100' : ''
-              }`}
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/documents') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t('documents')}
             </Link>
             <Link
               href="/reports"
-              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                isActive('/reports') ? 'bg-blue-600 text-blue-100' : ''
-              }`}
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/reports') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
               onClick={() => setIsMenuOpen(false)}
             >
               {t('reports')}
@@ -198,9 +192,8 @@ export default function Navbar() {
             {user?.role === 'admin' && (
               <Link
                 href="/admin"
-                className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${
-                  isActive('/admin') ? 'bg-blue-600 text-blue-100' : ''
-                }`}
+                className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/admin') ? 'bg-blue-600 text-blue-100' : ''
+                  }`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('admin')}

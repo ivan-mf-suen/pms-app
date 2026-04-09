@@ -21,6 +21,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     admin: 'Admin',
     tenants: 'Tenants',
     payments: 'Payments',
+    pms_phototype: 'PMS Phototype',
 
     // display
     grid: 'grid',
@@ -517,6 +518,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     admin: '管理',
     tenants: '租戶',
     payments: '付款',
+    pms_phototype: '物業管理系統 Prototype',
 
      // display
     grid: '格狀檢視',
