@@ -697,6 +697,7 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     searchByBrandModelOrLocation: '按品牌、型號或位置搜索...',
     searchMaintenancePlaceholder: '按品牌、型號、預估成本、優先次序或描述搜索...',
     year: '年份',
+    inventoryType: '類型',
 
     // Work Orders
     workOrder: '工作單',
@@ -809,6 +810,8 @@ export const i18nDict: Record<Language, I18nDictionary> = {
     linkToMaintenance: '連結至維護請求（選填）',
     linkToWorkOrder: '連結至工作單（選填）',
     uploadAndManageDocuments: '上傳和管理與資產、維護請求或工作單相關的文件',
+    noRelationships: '未關聯任何項目',
+    relationships: '關聯項目',
 
     // Reports
     reportsTitle: '報告',

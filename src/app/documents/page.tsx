@@ -253,7 +253,7 @@ export default function DocumentsPage() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('fileName')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('fileSize')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('fileType')}</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">Relationships</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('relationships')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('uploadDate')}</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-800">{t('actions')}</th>
                 </tr>
@@ -283,7 +283,7 @@ export default function DocumentsPage() {
                         <div className="space-y-1">
                           {property && (
                             <div className="text-xs">
-                              <span className="font-semibold text-gray-600">Property:</span>{' '}
+                              <span className="font-semibold text-gray-600">{t('property')}:</span>{' '}
                               <Link
                                 href={`/properties/${property.id}`}
                                 className="text-blue-600 hover:underline hover:text-blue-800"
@@ -294,7 +294,7 @@ export default function DocumentsPage() {
                           )}
                           {maintenance && (
                             <div className="text-xs">
-                              <span className="font-semibold text-gray-600">Maintenance:</span>{' '}
+                              <span className="font-semibold text-gray-600">{t('maintenance')}:</span>{' '}
                               <Link
                                 href={`/maintenance/${maintenance.id}`}
                                 className="text-blue-600 hover:underline hover:text-blue-800"
@@ -305,7 +305,7 @@ export default function DocumentsPage() {
                           )}
                           {workOrder && (
                             <div className="text-xs">
-                              <span className="font-semibold text-gray-600">Work Order:</span>{' '}
+                              <span className="font-semibold text-gray-600">{t('workOrder')}:</span>{' '}
                               <Link
                                 href={`/work-orders/${workOrder.id}`}
                                 className="text-blue-600 hover:underline hover:text-blue-800"
@@ -315,7 +315,7 @@ export default function DocumentsPage() {
                             </div>
                           )}
                           {!property && !maintenance && !workOrder && (
-                            <span className="text-xs text-gray-400">No relationships</span>
+                            <span className="text-xs text-gray-400">{t('noRelationships')}</span>
                           )}
                         </div>
                       </td>

@@ -395,7 +395,7 @@ export default function PropertyDetailPage() {
                       <p className="text-gray-600 text-sm mt-1">{request.description}</p>
                       <div className="flex gap-2 mt-2">
                         <span
-                          className={`text-xs px-2 py-1 rounded ${request.priority === 'urgent'
+                          className={`text-xs px-2 py-1 rounded font-semibold ${request.priority === 'urgent'
                               ? 'bg-red-100 text-red-800'
                               : request.priority === 'high'
                                 ? 'bg-orange-100 text-orange-800'
@@ -404,10 +404,10 @@ export default function PropertyDetailPage() {
                                   : 'bg-gray-100 text-gray-800'
                             }`}
                         >
-                          {request.priority}
+                          {t(`priority_${request.priority}`)}
                         </span>
                         <span
-                          className={`text-xs px-2 py-1 rounded ${request.status === 'completed'
+                          className={`text-xs px-2 py-1 rounded font-semibold ${request.status === 'completed'
                               ? 'bg-green-100 text-green-800'
                               : request.status === 'in_progress'
                                 ? 'bg-blue-100 text-blue-800'
@@ -416,7 +416,7 @@ export default function PropertyDetailPage() {
                                   : 'bg-gray-100 text-gray-800'
                             }`}
                         >
-                          {request.status}
+                          {t(`maintenanceStatus_${request.status}`)}
                         </span>
                       </div>
                       <p className="text-blue-600 text-xs mt-3 font-semibold">
