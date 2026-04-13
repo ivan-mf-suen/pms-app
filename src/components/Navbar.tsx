@@ -69,6 +69,12 @@ export default function Navbar() {
                 {t('workOrders')}
               </Link>
               <Link
+                href="/tendering"
+                className={`hover:text-blue-200 transition ${isActive('/tendering') ? 'text-blue-300 border-b-2 border-blue-300' : ''}`}
+              >
+                {t('tendering') || 'Tendering'}
+              </Link>
+              <Link
                 href="/documents"
                 className={`hover:text-blue-200 transition ${isActive('/documents') ? 'text-blue-300 border-b-2 border-blue-300' : ''}`}
               >
@@ -172,6 +178,14 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               {t('workOrders')}
+            </Link>
+            <Link
+              href="/tendering"
+              className={`block px-4 py-2 rounded hover:bg-slate-700 transition ${isActive('/tendering') ? 'bg-blue-600 text-blue-100' : ''
+                }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {t('tendering') || 'Tendering'}
             </Link>
             <Link
               href="/documents"

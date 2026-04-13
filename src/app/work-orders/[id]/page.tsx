@@ -155,27 +155,38 @@ export default function WorkOrderDetailPage() {
                 {property?.address} 
               </p>
             </div>
-            {(user?.role === 'admin' || user?.role === 'manager') && (
-              <Link
-                href={`/work-orders/${id}/edit`}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
-                title="Edit work order"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="flex gap-2">
+              {wo.tenders && wo.tenders.length > 0 && (
+                <Link
+                  href={`/work-orders/${id}/tendering`}
+                  className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition font-semibold text-sm flex items-center gap-2"
+                  title={`View ${wo.tenders.length} tender(s) for this work order`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-              </Link>
-            )}
+                  📋 {wo.tenders.length} {t('tenders')}
+                </Link>
+              )}
+              {(user?.role === 'admin' || user?.role === 'manager') && (
+                <Link
+                  href={`/work-orders/${id}/edit`}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                  title="Edit work order"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -378,6 +389,134 @@ export default function WorkOrderDetailPage() {
               </div>
             </div>
 
+            {/* Tendering */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-gray-800">{t('tendering')}</h2>
+                <Link
+                  href={`/work-orders/${id}/tendering/create`}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition"
+                  title="Create a new tender for this work order"
+                >
+                  + {t('addTender') || 'Add Tender'}
+                </Link>
+              </div>
+              {wo.tenders && wo.tenders.length > 0 ? (
+                <div className="space-y-4">
+                  {wo.tenders.map((tender: any) => {
+                    const companyName = tender.company?.name || `Company ${tender.companyId}`;
+                    const contactName = tender.company?.contactPerson?.name || 'Not provided';
+                    const contactPhone = tender.company?.contactPerson?.phone || 'N/A';
+                    
+                    // Status color mapping
+                    const statusColors: Record<string, string> = {
+                      pending: 'bg-yellow-100 text-yellow-800',
+                      submitted: 'bg-blue-100 text-blue-800',
+                      awarded: 'bg-green-100 text-green-800',
+                      rejected: 'bg-red-100 text-red-800',
+                      cancelled: 'bg-gray-100 text-gray-800'
+                    };
+                    const statusLabels: Record<string, string> = {
+                      pending: t('tenderStatusPending') || 'Pending',
+                      submitted: t('tenderStatusSubmitted') || 'Submitted',
+                      awarded: t('tenderStatusAwarded') || 'Awarded',
+                      rejected: t('tenderStatusRejected') || 'Rejected',
+                      cancelled: t('tenderStatusCancelled') || 'Cancelled'
+                    };
+                    
+                    const currentStatus = tender.status || (tender.awarded ? 'awarded' : 'pending');
+                    const statusColor = statusColors[currentStatus] || statusColors.pending;
+                    const statusLabel = statusLabels[currentStatus] || currentStatus;
+                    
+                    return (
+                      <div
+                        key={tender.id}
+                        className={`border rounded-lg p-4 transition ${
+                          currentStatus === 'awarded'
+                            ? 'border-green-300 bg-green-50'
+                            : currentStatus === 'rejected'
+                            ? 'border-red-300 bg-red-50'
+                            : currentStatus === 'cancelled'
+                            ? 'border-gray-300 bg-gray-50'
+                            : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                        }`}
+                      >
+                        <Link
+                              href={`/tendering/${tender.id}`}
+                              className="font-semibold text-blue-600 hover:text-blue-800 transition"
+                            >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            
+                              {companyName}
+                          
+                            <p className="text-sm text-gray-600 mt-1">{t('contactPerson')}: {contactName}</p>
+                          </div>
+                          <div className="flex gap-2 ml-2">
+                            <span
+                              className={`inline-block px-3 py-1 rounded text-xs font-semibold whitespace-nowrap ${statusColor}`}
+                            >
+                              {statusLabel}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 pt-3 border-t border-gray-200">
+                          <div>
+                            <p className="text-xs font-semibold text-gray-600 uppercase mb-1">{t('tenderingFee')}</p>
+                            <p className="text-lg font-bold text-gray-900">HKD ${tender.fee.toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-600 uppercase mb-1">{t('submissionDate')}</p>
+                            <p className="text-gray-800">{tender.submissionDate}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-600 uppercase mb-1">{t('contactPhone')}</p>
+                            <p className="text-gray-800">{contactPhone}</p>
+                          </div>
+                        </div>
+                        {tender.deadline && (
+                          <div className="mt-3 flex justify-between text-sm">
+                            <span className="text-gray-600">{t('tenderDeadline')}: {tender.deadline}</span>
+                            {tender.awardedDate && (
+                              <span className="text-green-600 font-semibold">{t('awardedDate')}: {tender.awardedDate}</span>
+                            )}
+                          </div>
+                        )}
+                        {tender.remarks && tender.remarks.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-gray-200">
+                            <p className="text-xs font-semibold text-gray-600 mb-2">{t('remarks')}:</p>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              {tender.remarks.map((remark: any) => (
+                                <li key={remark.id} className="text-xs">
+                                  • {remark.text}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {tender.awarded && (
+                          <div className="mt-3 pt-3 border-t border-green-200">
+                            <p className="text-xs font-semibold text-green-700">✓ {t('awardTender')} - {t('awardedDate')}: {tender.awardedDate}</p>
+                          </div>
+                        )}
+                          </Link>
+                      </div>
+                      
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p className="text-sm mb-4">{t('noTenders')}</p>
+                  <Link
+                    href={`/work-orders/${id}/tendering/create`}
+                    className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition"
+                  >
+                    + {t('addTender') || 'Add Tender'}
+                  </Link>
+                </div>
+              )}
+            </div>
             
           </div>
 

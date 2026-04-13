@@ -210,27 +210,38 @@ export default function WorkOrdersPage() {
             <h1 className="text-3xl font-bold text-gray-800">{t('workOrders')}</h1>
             <p className="text-gray-600 mt-1">{t('workOrdersDescription')}</p>
           </div>
-          {(user?.role === 'admin' || user?.role === 'manager') && (
-            <Link
-              href="/work-orders/create"
-              className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
-              title="Create new work order"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-            </Link>
-          )}
+          <div className="flex items-center gap-3">
+            {(user?.role === 'admin' || user?.role === 'manager') && (
+              <>
+                <Link
+                  href="/tendering"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-semibold text-sm"
+                  title="View tendering management"
+                >
+                  {t('tendering')} 📋
+                </Link>
+                <Link
+                  href="/work-orders/create"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition"
+                  title="Create new work order"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

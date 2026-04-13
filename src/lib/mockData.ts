@@ -127,6 +127,46 @@ export interface Remark {
   timestamp: string;
 }
 
+export interface TenderDocument {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  uploadDate: string;
+  documentPath: string;
+}
+
+export interface TenderCompany {
+  id: string;
+  name: string;
+  registrationNumber: string;
+  licenseInfo: string;
+  contactPerson: {
+    name: string;
+    phone: string;
+    email: string;
+    address: string;
+  };
+}
+
+export interface Tender {
+  id: string;
+  workOrderId: string;
+  companyId: string;
+  company?: TenderCompany; // Denormalized for convenience
+  fee: number;
+  submissionDate: string;
+  deadline: string;
+  awardedDate?: string;
+  controlNumber?: string;
+  awarded: boolean;
+  status: 'pending' | 'submitted' | 'awarded' | 'rejected' | 'cancelled'; // Tender status
+  documentIds: string[];
+  documents?: TenderDocument[];
+  remarks: Remark[];
+  auditLog: AuditLogEntry[];
+}
+
 export interface WorkOrder {
   id: string;
   controlNumber: string;
@@ -145,6 +185,7 @@ export interface WorkOrder {
   };
   remarks: Remark[];
   auditLog: AuditLogEntry[];
+  tenders?: Tender[];
 }
 
 export interface Document {
@@ -899,6 +940,75 @@ export const mockWorkOrders: WorkOrder[] = [
         changes: { status: 'in_progress' },
       },
     ],
+    tenders: [
+      {
+        id: 'tender-001',
+        workOrderId: 'wo-001',
+        companyId: 'company-001',
+        company: {
+          id: 'company-001',
+          name: 'Premier HVAC Solutions',
+          registrationNumber: 'REG-001',
+          licenseInfo: 'License: HVAC-2024',
+          contactPerson: {
+            name: 'John Kwok',
+            phone: '2567-8901',
+            email: 'john@premier-hvac.hk',
+            address: 'Rm 201, Causeway Tower, HK',
+          },
+        },
+        fee: 2200,
+        submissionDate: '2026-01-10',
+        deadline: '2026-01-17',
+        awardedDate: '2026-01-12',
+        awarded: true,
+        status: 'awarded',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t1',
+            text: 'Includes warranty for 2 years',
+            author: 'company-001',
+            username: 'Premier HVAC - John Kwok',
+            timestamp: '2026-01-10T08:00:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+      {
+        id: 'tender-002',
+        workOrderId: 'wo-001',
+        companyId: 'company-002',
+        company: {
+          id: 'company-002',
+          name: 'Express Cooling Services',
+          registrationNumber: 'REG-002',
+          licenseInfo: 'License: HVAC-2024',
+          contactPerson: {
+            name: 'Lucy Chen',
+            phone: '2345-6789',
+            email: 'lucy@expresscooling.hk',
+            address: 'Rm 305, Tech Tower, HK',
+          },
+        },
+        fee: 2400,
+        submissionDate: '2026-01-11',
+        deadline: '2026-01-17',
+        awarded: false,
+        status: 'pending',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t2',
+            text: 'Quick response time, weekend availability',
+            author: 'company-002',
+            username: 'Express Cooling - Lucy Chen',
+            timestamp: '2026-01-11T10:30:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+    ],
   },
   {
     id: 'wo-002',
@@ -950,6 +1060,75 @@ export const mockWorkOrders: WorkOrder[] = [
         entityType: 'work_order',
         entityId: 'wo-002',
         changes: { status: 'in_progress' },
+      },
+    ],
+    tenders: [
+      {
+        id: 'tender-003',
+        workOrderId: 'wo-002',
+        companyId: 'company-003',
+        company: {
+          id: 'company-003',
+          name: 'Apex Roofing & Repairs',
+          registrationNumber: 'REG-003',
+          licenseInfo: 'License: ROOF-2024',
+          contactPerson: {
+            name: 'Michael Wong',
+            phone: '9876-5432',
+            email: 'michael@apexroofing.hk',
+            address: 'Rm 501, Builders Center, HK',
+          },
+        },
+        fee: 5200,
+        submissionDate: '2026-02-02',
+        deadline: '2026-02-09',
+        awardedDate: '2026-02-06',
+        awarded: true,
+        status: 'awarded',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t3',
+            text: '10-year warranty on materials and labor',
+            author: 'company-003',
+            username: 'Apex Roofing - Michael Wong',
+            timestamp: '2026-02-02T09:00:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+      {
+        id: 'tender-004',
+        workOrderId: 'wo-002',
+        companyId: 'company-004',
+        company: {
+          id: 'company-004',
+          name: 'SecureHome Building Services',
+          registrationNumber: 'REG-004',
+          licenseInfo: 'License: BUILD-2024',
+          contactPerson: {
+            name: 'Sarah Leung',
+            phone: '2111-2222',
+            email: 'sarah@securehome.hk',
+            address: 'Rm 401, Service Plaza, HK',
+          },
+        },
+        fee: 6000,
+        submissionDate: '2026-02-03',
+        deadline: '2026-02-09',
+        awarded: false,
+        status: 'pending',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t4',
+            text: 'Includes inspection for water damage assessment',
+            author: 'company-004',
+            username: 'SecureHome - Sarah Leung',
+            timestamp: '2026-02-03T10:30:00Z',
+          },
+        ],
+        auditLog: [],
       },
     ],
   },
@@ -1085,8 +1264,731 @@ export const mockWorkOrders: WorkOrder[] = [
         entityId: 'wo-010',
       },
     ],
+    tenders: [
+      {
+        id: 'tender-013',
+        workOrderId: 'wo-005',
+        companyId: 'company-007',
+        company: {
+          id: 'company-007',
+          name: 'Comfort Climate Solutions',
+          registrationNumber: 'REG-007',
+          licenseInfo: 'License: HVAC-2024, Mini-Split Specialist',
+          contactPerson: {
+            name: 'David Lo',
+            phone: '2789-3456',
+            email: 'david@comfortclimate.hk',
+            address: 'Rm 601, Climate Tower, HK',
+          },
+        },
+        fee: 1250,
+        submissionDate: '2026-02-11',
+        deadline: '2026-02-18',
+        awardedDate: '2026-02-14',
+        awarded: true,
+        status: 'awarded',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t013',
+            text: '2-year warranty on labor and parts. Fast response time available.',
+            author: 'company-007',
+            username: 'David Lo',
+            timestamp: '2026-02-11T09:00:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+      {
+        id: 'tender-014',
+        workOrderId: 'wo-005',
+        companyId: 'company-008',
+        company: {
+          id: 'company-008',
+          name: 'Advanced HVAC Maintenance Ltd',
+          registrationNumber: 'REG-008',
+          licenseInfo: 'License: HVAC-2024, ISO Certified',
+          contactPerson: {
+            name: 'Eva Wong',
+            phone: '2456-8901',
+            email: 'eva@advancedhvac.hk',
+            address: 'Rm 205, Pro Building, HK',
+          },
+        },
+        fee: 1400,
+        submissionDate: '2026-02-12',
+        deadline: '2026-02-18',
+        awarded: false,
+        status: 'pending',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t014',
+            text: 'ISO 9001 certified company with excellent track record.',
+            author: 'company-008',
+            username: 'Eva Wong',
+            timestamp: '2026-02-12T10:30:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+      {
+        id: 'tender-015',
+        workOrderId: 'wo-005',
+        companyId: 'company-009',
+        company: {
+          id: 'company-009',
+          name: '優越暖通服務公司',
+          registrationNumber: 'REG-009',
+          licenseInfo: '暖通系統維修及安裝 | 5年專業經驗',
+          contactPerson: {
+            name: '劉浩明',
+            phone: '2890-4567',
+            email: 'hao.liu@excellenthvac.hk',
+            address: '香港灣仔謝斐道123號維修中心7樓',
+          },
+        },
+        fee: 1100,
+        submissionDate: '2026-02-10',
+        deadline: '2026-02-18',
+        awarded: false,
+        status: 'pending',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t015',
+            text: '提供24小時緊急服務。',
+            author: 'company-009',
+            username: '劉浩明',
+            timestamp: '2026-02-10T08:00:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+    ],
+  },
+  {
+    id: 'wo-006',
+    controlNumber: 'WO-2026-0006',
+    propertyId: 'prop-004',
+    inventoryIds: ['inv-002'],
+    maintenanceRequestId: 'maint-010',
+    status: 'open',
+    createdDate: '2026-02-15',
+    priority: 'high',
+    description: 'Electrical wiring inspection and circuit breaker replacement',
+    financials: {
+      original: 3500,
+      voApproved: 0,
+      contingency: 700,
+    },
+    remarks: [
+      {
+        id: 'rem-020',
+        text: 'Annual electrical safety inspection scheduled.',
+        author: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
+        timestamp: '2026-02-15T10:00:00Z',
+      },
+    ],
+    auditLog: [
+      {
+        id: 'audit-016',
+        action: 'create',
+        actor: 'manager@poleungkuk.org.hk',
+        username: 'Manager - Emma Lam',
+        timestamp: '2026-02-15T09:45:00Z',
+        entityType: 'work_order',
+        entityId: 'wo-006',
+      },
+    ],
+    tenders: [
+      {
+        id: 'tender-016',
+        workOrderId: 'wo-006',
+        companyId: 'company-010',
+        company: {
+          id: 'company-010',
+          name: 'PowerSafe Electrical Engineers',
+          registrationNumber: 'REG-010',
+          licenseInfo: 'License: ELEC-2024, Safety Certified',
+          contactPerson: {
+            name: 'Thomas Chan',
+            phone: '2567-1234',
+            email: 'thomas@powersafe.hk',
+            address: 'Rm 801, Safety Center, HK',
+          },
+        },
+        fee: 3700,
+        submissionDate: '2026-02-15',
+        deadline: '2026-02-22',
+        awardedDate: '2026-02-17',
+        awarded: true,
+        status: 'awarded',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t016',
+            text: '包含全面的安全檢查報告和5年保修。Complete safety report and 5-year warranty included.',
+            author: 'company-010',
+            username: 'Thomas Chan',
+            timestamp: '2026-02-15T14:00:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+      {
+        id: 'tender-017',
+        workOrderId: 'wo-006',
+        companyId: 'company-011',
+        company: {
+          id: 'company-011',
+          name: '電氣卓越服務有限公司',
+          registrationNumber: 'BR-2019-009999',
+          licenseInfo: '電力工程持牌承建商 | 建築業註冊',
+          contactPerson: {
+            name: '黃志豪',
+            phone: '+852 2123-8765',
+            email: 'zhihao.huang@excellentelectric.hk',
+            address: '九龍紅磡漆咸道北200號工業中心5樓',
+          },
+        },
+        fee: 4100,
+        submissionDate: '2026-02-16',
+        deadline: '2026-02-22',
+        awarded: false,
+        status: 'pending',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t017',
+            text: '經驗豐富的電工隊伍配備最新測試設備。',
+            author: 'company-011',
+            username: '黃志豪',
+            timestamp: '2026-02-16T09:30:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+      {
+        id: 'tender-018',
+        workOrderId: 'wo-006',
+        companyId: 'company-012',
+        company: {
+          id: 'company-012',
+          name: 'Certified Electric Solutions',
+          registrationNumber: 'REG-012',
+          licenseInfo: 'License: ELEC-2024, Building Certified',
+          contactPerson: {
+            name: 'Maria Santos',
+            phone: '2890-5678',
+            email: 'maria@certifiedelectric.hk',
+            address: 'Rm 302, Certified Plaza, HK',
+          },
+        },
+        fee: 3500,
+        submissionDate: '2026-02-14',
+        deadline: '2026-02-22',
+        awarded: false,
+        status: 'pending',
+        documentIds: [],
+        remarks: [
+          {
+            id: 'rem-t018',
+            text: 'Lowest quote with competitive pricing and same-day availability.',
+            author: 'company-012',
+            username: 'Maria Santos',
+            timestamp: '2026-02-14T16:00:00Z',
+          },
+        ],
+        auditLog: [],
+      },
+    ],
   },
 ];
+
+export const mockTenderCompanies: TenderCompany[] = [
+  {
+    id: 'comp-001',
+    name: '中華建築工程有限公司',
+    registrationNumber: 'BR-2018-001234',
+    licenseInfo: '持牌承建商 | 建築業註冊 2018',
+    contactPerson: {
+      name: '李明偉',
+      phone: '+852 2234-5678',
+      email: 'alfred.lee@chinesebuilding.hk',
+      address: '香港灣仔駱克道193號東昇中心15樓',
+    },
+  },
+  {
+    id: 'comp-002',
+    name: '東亞工程集團有限公司',
+    registrationNumber: 'BR-2015-005678',
+    licenseInfo: '持牌承建商 | 暖通及電氣系統 | 建築業註冊',
+    contactPerson: {
+      name: '王美玲',
+      phone: '+852 2567-8901',
+      email: 'mei.wang@eastasiaeng.hk',
+      address: '九龍旺角彌敦道600號恆隆中心28樓',
+    },
+  },
+  {
+    id: 'comp-003',
+    name: '嘉運建築承建有限公司',
+    registrationNumber: 'BR-2017-003456',
+    licenseInfo: '持牌承建商 | 機械及電氣維修 | 建築業註冊',
+    contactPerson: {
+      name: '陳國強',
+      phone: '+852 2123-4567',
+      email: 'kwostrong.chan@jiarunbuilding.hk',
+      address: '香港北角英皇道365號榮華商業大廈12樓',
+    },
+  },
+  {
+    id: 'comp-004',
+    name: '環球機械管道公司',
+    registrationNumber: 'BR-2016-007890',
+    licenseInfo: '水管及暖通工程 | 建築業註冊 2016',
+    contactPerson: {
+      name: '鄧曼詩',
+      phone: '+852 2789-0123',
+      email: 'manshy.tang@globalplumbing.hk',
+      address: '香港中環威靈頓街88號中環商業大廈18樓',
+    },
+  },
+  {
+    id: 'comp-005',
+    name: '宏業建築及維修服務',
+    registrationNumber: 'BR-2020-001111',
+    licenseInfo: '建築及維修服務 | 設施管理 | 建築業註冊',
+    contactPerson: {
+      name: '梁家俊',
+      phone: '+852 2456-7890',
+      email: 'garyjong.leung@hongyelanding.hk',
+      address: '九龍深水埗北河街178號新天地廣場10樓',
+    },
+  },
+  {
+    id: 'comp-006',
+    name: '樂新暖通系統有限公司',
+    registrationNumber: 'BR-2019-002222',
+    licenseInfo: '暖通 (HVAC) 專門維修及安裝 | 建築業註冊',
+    contactPerson: {
+      name: '蔡浩然',
+      phone: '+852 2890-1234',
+      email: 'haoran.tsai@jubilanthvac.hk',
+      address: '香港屯門青河路51號屯門貿易中心 B座 22樓',
+    },
+  },
+  {
+    id: 'comp-007',
+    name: '優質水電安裝有限公司',
+    registrationNumber: 'BR-2018-003333',
+    licenseInfo: '水電安裝及維修 | 持牌電工 | 建築業註冊',
+    contactPerson: {
+      name: '何麗君',
+      phone: '+852 2012-3456',
+      email: 'liza.ho@qualityelecplumb.hk',
+      address: '香港荃灣楊屋道100號荃灣廣場 B座 8樓',
+    },
+  },
+  {
+    id: 'comp-008',
+    name: '瑞盛建築維護有限公司',
+    registrationNumber: 'BR-2017-004444',
+    licenseInfo: '建築維護及修繕 | 消防安全系統 | 建築業註冊',
+    contactPerson: {
+      name: '馬恆昌',
+      phone: '+852 2345-6789',
+      email: 'henry.ma@ruishengmaint.hk',
+      address: '新界沙田火炭樟樹灣街1號新界工業中心 D座 5樓',
+    },
+  },
+  {
+    id: 'comp-009',
+    name: '聯合機械維修集團',
+    registrationNumber: 'BR-2015-005555',
+    licenseInfo: '工業機械維修 | 設施管理 | 持牌工程師',
+    contactPerson: {
+      name: '黃健華',
+      phone: '+852 2567-8901',
+      email: 'kinware.wong@unionmechrepair.hk',
+      address: '香港柴灣永泰道28號東亞銀行中心 L座 15樓',
+    },
+  },
+  {
+    id: 'comp-010',
+    name: '威宏工程與承建公司',
+    registrationNumber: 'BR-2016-006666',
+    licenseInfo: '大型工程項目 | 持牌監工 | 建築業註冊 2016',
+    contactPerson: {
+      name: '蘇民俊',
+      phone: '+852 2789-0123',
+      email: 'min.su@waihoungconstr.hk',
+      address: '香港堅尼地城屈地街23號嘉蘭中心 6樓',
+    },
+  },
+];
+
+export const mockTenders: Tender[] = [
+  {
+    id: 'tender-001',
+    workOrderId: 'wo-001',
+    companyId: 'comp-001',
+    company: {
+      id: 'comp-001',
+      name: '中華建築工程有限公司',
+      registrationNumber: 'BR-2018-001234',
+      licenseInfo: '持牌承建商 | 建築業註冊 2018',
+      contactPerson: {
+        name: '李明偉',
+        phone: '+852 2234-5678',
+        email: 'alfred.lee@chinesebuilding.hk',
+        address: '香港灣仔駱克道193號東昇中心15樓',
+      },
+    },
+    fee: 5200,
+    submissionDate: '2026-02-20',
+    deadline: '2026-03-05',
+    awardedDate: '2026-02-25',
+    controlNumber: 'TENDER-WO-001-001',
+    awarded: true,
+    status: 'awarded',
+    documentIds: ['doc-tender-001-01'],
+    remarks: [
+      {
+        id: 'rem-t001',
+        text: '投標方案已審核，並符合技術規格要求。',
+        author: 'manager@example.com',
+        username: 'Manager - Emma Lam',
+        timestamp: '2026-02-25T10:30:00Z',
+      },
+    ],
+    auditLog: [
+      {
+        id: 'audit-t001',
+        action: 'create',
+        actor: 'manager@example.com',
+        username: 'Manager - Emma Lam',
+        timestamp: '2026-02-20T09:00:00Z',
+        entityType: 'work_order',
+        entityId: 'wo-001',
+      },
+    ],
+  },
+  {
+    id: 'tender-002',
+    workOrderId: 'wo-001',
+    companyId: 'comp-002',
+    company: {
+      id: 'comp-002',
+      name: '東亞工程集團有限公司',
+      registrationNumber: 'BR-2015-005678',
+      licenseInfo: '持牌承建商 | 暖通及電氣系統 | 建築業註冊',
+      contactPerson: {
+        name: '王美玲',
+        phone: '+852 2567-8901',
+        email: 'mei.wang@eastasiaeng.hk',
+        address: '九龍旺角彌敦道600號恆隆中心28樓',
+      },
+    },
+    fee: 5800,
+    submissionDate: '2026-02-21',
+    deadline: '2026-03-05',
+    awarded: false,
+    status: 'pending',
+    documentIds: [],
+    remarks: [],
+    auditLog: [],
+  },
+  {
+    id: 'tender-003',
+    workOrderId: 'wo-001',
+    companyId: 'comp-003',
+    company: {
+      id: 'comp-003',
+      name: '嘉運建築承建有限公司',
+      registrationNumber: 'BR-2017-003456',
+      licenseInfo: '持牌承建商 | 機械及電氣維修 | 建築業註冊',
+      contactPerson: {
+        name: '陳國強',
+        phone: '+852 2123-4567',
+        email: 'kwostrong.chan@jiarunbuilding.hk',
+        address: '香港北角英皇道365號榮華商業大廈12樓',
+      },
+    },
+    fee: 4950,
+    submissionDate: '2026-02-19',
+    deadline: '2026-03-05',
+    awarded: false,
+    status: 'pending',
+    documentIds: [],
+    remarks: [],
+    auditLog: [],
+  },
+  {
+    id: 'tender-004',
+    workOrderId: 'wo-002',
+    companyId: 'comp-004',
+    company: {
+      id: 'comp-004',
+      name: '環球機械管道公司',
+      registrationNumber: 'BR-2016-007890',
+      licenseInfo: '水管及暖通工程 | 建築業註冊 2016',
+      contactPerson: {
+        name: '鄧曼詩',
+        phone: '+852 2789-0123',
+        email: 'manshy.tang@globalplumbing.hk',
+        address: '香港中環威靈頓街88號中環商業大廈18樓',
+      },
+    },
+    fee: 12500,
+    submissionDate: '2026-03-01',
+    deadline: '2026-03-15',
+    awardedDate: '2026-03-08',
+    controlNumber: 'TENDER-WO-002-001',
+    awarded: true,
+    status: 'awarded',
+    documentIds: ['doc-tender-002-01'],
+    remarks: [
+      {
+        id: 'rem-t004',
+        text: '方案優勢：經驗豐富，承建過多個大型暖通工程。',
+        author: 'admin@example.com',
+        username: 'Admin - Ivan Suen',
+        timestamp: '2026-03-08T14:00:00Z',
+      },
+    ],
+    auditLog: [],
+  },
+  {
+    id: 'tender-005',
+    workOrderId: 'wo-002',
+    companyId: 'comp-005',
+    company: {
+      id: 'comp-005',
+      name: '宏業建築及維修服務',
+      registrationNumber: 'BR-2020-001111',
+      licenseInfo: '建築及維修服務 | 設施管理 | 建築業註冊',
+      contactPerson: {
+        name: '梁家俊',
+        phone: '+852 2456-7890',
+        email: 'garyjong.leung@hongyelanding.hk',
+        address: '九龍深水埗北河街178號新天地廣場10樓',
+      },
+    },
+    fee: 14200,
+    submissionDate: '2026-03-02',
+    deadline: '2026-03-15',
+    awarded: false,
+    status: 'pending',
+    documentIds: [],
+    remarks: [],
+    auditLog: [],
+  },
+  {
+    id: 'tender-006',
+    workOrderId: 'wo-003',
+    companyId: 'comp-006',
+    company: {
+      id: 'comp-006',
+      name: '樂新暖通系統有限公司',
+      registrationNumber: 'BR-2019-002222',
+      licenseInfo: '暖通 (HVAC) 專門維修及安裝 | 建築業註冊',
+      contactPerson: {
+        name: '蔡浩然',
+        phone: '+852 2890-1234',
+        email: 'haoran.tsai@jubilanthvac.hk',
+        address: '香港屯門青河路51號屯門貿易中心 B座 22樓',
+      },
+    },
+    fee: 3800,
+    submissionDate: '2026-02-15',
+    deadline: '2026-03-01',
+    awarded: false,
+    status: 'pending',
+    documentIds: [],
+    remarks: [],
+    auditLog: [],
+  },
+  {
+    id: 'tender-007',
+    workOrderId: 'wo-003',
+    companyId: 'comp-007',
+    company: {
+      id: 'comp-007',
+      name: '優質水電安裝有限公司',
+      registrationNumber: 'BR-2018-003333',
+      licenseInfo: '水電安裝及維修 | 持牌電工 | 建築業註冊',
+      contactPerson: {
+        name: '何麗君',
+        phone: '+852 2012-3456',
+        email: 'liza.ho@qualityelecplumb.hk',
+        address: '香港荃灣楊屋道100號荃灣廣場 B座 8樓',
+      },
+    },
+    fee: 4200,
+    submissionDate: '2026-02-16',
+    deadline: '2026-03-01',
+    awardedDate: '2026-02-28',
+    controlNumber: 'TENDER-WO-003-001',
+    awarded: true,
+    status: 'awarded',
+    documentIds: ['doc-tender-003-01', 'doc-tender-003-02'],
+    remarks: [],
+    auditLog: [],
+  },
+  {
+    id: 'tender-008',
+    workOrderId: 'wo-004',
+    companyId: 'comp-008',
+    company: {
+      id: 'comp-008',
+      name: '瑞盛建築維護有限公司',
+      registrationNumber: 'BR-2017-004444',
+      licenseInfo: '建築維護及修繕 | 消防安全系統 | 建築業註冊',
+      contactPerson: {
+        name: '馬恆昌',
+        phone: '+852 2345-6789',
+        email: 'henry.ma@ruishengmaint.hk',
+        address: '新界沙田火炭樟樹灣街1號新界工業中心 D座 5樓',
+      },
+    },
+    fee: 8500,
+    submissionDate: '2026-02-13',
+    deadline: '2026-02-28',
+    awarded: false,
+    status: 'pending',
+    documentIds: [],
+    remarks: [],
+    auditLog: [],
+  },
+  {
+    id: 'tender-009',
+    workOrderId: 'wo-004',
+    companyId: 'comp-009',
+    company: {
+      id: 'comp-009',
+      name: '聯合機械維修集團',
+      registrationNumber: 'BR-2015-005555',
+      licenseInfo: '工業機械維修 | 設施管理 | 持牌工程師',
+      contactPerson: {
+        name: '黃健華',
+        phone: '+852 2567-8901',
+        email: 'kinware.wong@unionmechrepair.hk',
+        address: '香港柴灣永泰道28號東亞銀行中心 L座 15樓',
+      },
+    },
+    fee: 7800,
+    submissionDate: '2026-02-14',
+    deadline: '2026-02-28',
+    awardedDate: '2026-02-26',
+    controlNumber: 'TENDER-WO-004-001',
+    awarded: true,
+    status: 'awarded',
+    documentIds: [],
+    remarks: [
+      {
+        id: 'rem-t009',
+        text: '報價合理，施工時間短。',
+        author: 'manager@example.com',
+        username: 'Manager - Emma Lam',
+        timestamp: '2026-02-26T11:30:00Z',
+      },
+    ],
+    auditLog: [],
+  },
+  {
+    id: 'tender-010',
+    workOrderId: 'wo-005',
+    companyId: 'comp-010',
+    company: {
+      id: 'comp-010',
+      name: '威宏工程與承建公司',
+      registrationNumber: 'BR-2016-006666',
+      licenseInfo: '大型工程項目 | 持牌監工 | 建築業註冊 2016',
+      contactPerson: {
+        name: '蘇民俊',
+        phone: '+852 2789-0123',
+        email: 'min.su@waihoungconstr.hk',
+        address: '香港堅尼地城屈地街23號嘉蘭中心 6樓',
+      },
+    },
+    fee: 1050,
+    submissionDate: '2026-02-17',
+    deadline: '2026-03-05',
+    awarded: false,
+    status: 'pending',
+    documentIds: [],
+    remarks: [],
+    auditLog: [],
+  },
+  {
+    id: 'tender-011',
+    workOrderId: 'wo-005',
+    companyId: 'comp-001',
+    company: {
+      id: 'comp-001',
+      name: '中華建築工程有限公司',
+      registrationNumber: 'BR-2018-001234',
+      licenseInfo: '持牌承建商 | 建築業註冊 2018',
+      contactPerson: {
+        name: '李明偉',
+        phone: '+852 2234-5678',
+        email: 'alfred.lee@chinesebuilding.hk',
+        address: '香港灣仔駱克道193號東昇中心15樓',
+      },
+    },
+    fee: 975,
+    submissionDate: '2026-02-18',
+    deadline: '2026-03-05',
+    awardedDate: '2026-03-01',
+    controlNumber: 'TENDER-WO-005-001',
+    awarded: true,
+    status: 'awarded',
+    documentIds: [],
+    remarks: [],
+    auditLog: [],
+  },
+];
+
+// Utility functions for tendering
+export function generateTenderControlNumber(workOrderId: string, sequence: number): string {
+  return `TENDER-${workOrderId.toUpperCase()}-${String(sequence).padStart(3, '0')}`;
+}
+
+export function getTendersForWorkOrder(workOrderId: string): Tender[] {
+  const storedTenders = localStorage.getItem('tenders');
+  const localTenders = storedTenders ? JSON.parse(storedTenders) : [];
+  const allTenders = [...mockTenders, ...localTenders];
+  return allTenders.filter((t) => t.workOrderId === workOrderId);
+}
+
+export function saveTenderToStorage(tender: Tender): void {
+  const storedTenders = localStorage.getItem('tenders');
+  let allTenders = storedTenders ? JSON.parse(storedTenders) : [];
+  const index = allTenders.findIndex((t: Tender) => t.id === tender.id);
+  if (index >= 0) {
+    allTenders[index] = tender;
+  } else {
+    allTenders.push(tender);
+  }
+  localStorage.setItem('tenders', JSON.stringify(allTenders));
+}
+
+export function getTenderFromStorage(tenderId: string): Tender | undefined {
+  const storedTenders = localStorage.getItem('tenders');
+  const localTenders = storedTenders ? JSON.parse(storedTenders) : [];
+  const allTenders = [...mockTenders, ...localTenders];
+  return allTenders.find((t) => t.id === tenderId);
+}
+
+export function deleteTenderFromStorage(tenderId: string): void {
+  const storedTenders = localStorage.getItem('tenders');
+  let allTenders = storedTenders ? JSON.parse(storedTenders) : [];
+  allTenders = allTenders.filter((t: Tender) => t.id !== tenderId);
+  localStorage.setItem('tenders', JSON.stringify(allTenders));
+}
 
 export const mockDocuments: Document[] = [
   {
