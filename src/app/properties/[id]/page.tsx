@@ -9,6 +9,17 @@ import FloorMap from '@/components/FloorMap';
 import { useI18n } from '@/contexts/I18nContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import DxfViewer with no SSR
+const DxfViewer = dynamic(() => import('@/components/DxfViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-96 bg-gray-100 flex items-center justify-center rounded-lg border border-gray-300">
+      <p className="text-gray-500">Loading 3D viewer...</p>
+    </div>
+  ),
+});
 
 export default function PropertyDetailPage() {
   const params = useParams();
@@ -20,6 +31,7 @@ export default function PropertyDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFloorIndex, setSelectedFloorIndex] = useState(0);
   const [selectedInventoryId, setSelectedInventoryId] = useState<string | null>(null);
+  const [view2D3D, setView2D3D] = useState<'2D' | '3D'>('2D');
   const floorMapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -156,32 +168,65 @@ export default function PropertyDetailPage() {
 
             {/* Floor Map Section */}
             <div className="bg-white rounded-lg shadow overflow-hidden" ref={floorMapRef}>
-              {/* Floor Plan Tabs */}
-              {property.floorPlans && property.floorPlans.length > 1 && (
-                <div className="border-b bg-gray-50 p-4">
-                  <div className="flex gap-2 flex-wrap">
-                    {property.floorPlans.map((floor: any, index: number) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedFloorIndex(index)}
-                        className={`px-4 py-2 rounded transition font-semibold text-sm ${selectedFloorIndex === index
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                          }`}
-                      >
-                        {floor.label}
-                      </button>
-                    ))}
+              {/* Floor Plan Tabs and View Toggle */}
+              <div className="border-b bg-gray-50 p-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  {/* Floor Plan Tabs */}
+                  {property.floorPlans && property.floorPlans.length > 1 && (
+                    <div className="flex gap-2 flex-wrap">
+                      {property.floorPlans.map((floor: any, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedFloorIndex(index)}
+                          className={`px-4 py-2 rounded transition font-semibold text-sm ${selectedFloorIndex === index
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                            }`}
+                        >
+                          {floor.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 2D/3D Toggle */}
+                  <div className="flex gap-2 items-center">
+                    <button
+                      onClick={() => setView2D3D('2D')}
+                      className={`px-3 py-2 rounded transition font-semibold text-sm ${view2D3D === '2D'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        }`}
+                    >
+                      2D
+                    </button>
+                    <button
+                      onClick={() => setView2D3D('3D')}
+                      className={`px-3 py-2 rounded transition font-semibold text-sm ${view2D3D === '3D'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                        }`}
+                    >
+                      3D
+                    </button>
                   </div>
                 </div>
+              </div>
+
+              {/* Content based on view mode */}
+              {view2D3D === '2D' ? (
+                <FloorMap
+                  propertyId={property.id}
+                  floorPlanUrl={property.floorPlans?.[selectedFloorIndex]?.url || property.floorPlanUrl}
+                  inventory={mockInventory}
+                  currentFloorLabel={property.floorPlans?.[selectedFloorIndex]?.label}
+                  selectedInventoryId={selectedInventoryId}
+                />
+              ) : (
+                <div className="p-4 bg-white">
+                  <DxfViewer url="/giraffe360_demo_residential.dxf" width="100%" height="700px" />
+                </div>
               )}
-              <FloorMap
-                propertyId={property.id}
-                floorPlanUrl={property.floorPlans?.[selectedFloorIndex]?.url || property.floorPlanUrl}
-                inventory={mockInventory}
-                currentFloorLabel={property.floorPlans?.[selectedFloorIndex]?.label}
-                selectedInventoryId={selectedInventoryId}
-              />
             </div>
             {/* Product Inventory Details */}
             {propertyInventory.length > 0 && (
